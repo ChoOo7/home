@@ -3,6 +3,6 @@
 
 $optionDir = __DIR__.'/config/';
 
-$bandwidthFilePath = $optionDir.'bandwidth';
+$bandwidthFilePath = $optionDir.'bandwidthNow';
 
 file_put_contents($bandwidthFilePath, $argv[1]."\n");

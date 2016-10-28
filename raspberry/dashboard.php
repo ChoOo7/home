@@ -13,12 +13,65 @@ switch($action)
         $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
         exec($command);
         break;
-    case "downloadSpeedNormal":
-        $downloadSpeed = 200;
-        $command = 'php /var/home/raspberry/preloadResetCurrentSpeed.php';
-        exec($command);
-        break;
+  case "downloadSpeedNormal":
+    $downloadSpeed = 200;
+    $command = 'php /var/home/raspberry/preloadResetCurrentSpeed.php';
+    exec($command);
+    break;
+
+  case "powerOn":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutSystem_OnStandby/ON&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_OnOff/ON&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;
+  
+  case "powerOff":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutSystem_OnStandby/STANDBY&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;
+  
+  case "volumeUp":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutMasterVolumeBtn\>&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;
+
+  case "volumeDown":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutMasterVolumeBtn\<&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;
+  case "volumeSet":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutMasterVolumeSet/10&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;
+  
+  case "setInternet":
+  case "setRadio":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/IRADIO&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;
+
+  case "setBluetooth":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/BLUETOOTH&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;
+
+  case "setCable":
+    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/ANALOGIN&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
+    exec($command);
+    break;  
+    
+//http://www.openremote.org/display/docs/OpenRemote+2.0+How+To+-+Denon+HTTP+Control
+    
 }
+
+$stateXmlString = file_get_contents("http://192.168.0.120/goform/formMainZone_MainZoneXml.xml");
+//var_dump($stateXmlString);
+$stateXml = simplexml_load_string($stateXmlString);
+//var_dump($stateXml);
+$powerState = (string)$stateXml->Power->value;
+$currentInput = (string)$stateXml->InputFuncSelect->value;
+
 
 $lastLogs = array();
 exec("tail -n 20 /tmp/preloadLog", $lastLogs);
@@ -40,8 +93,15 @@ if(file_exists($speedConfigDir."bandwidthNow"))
 }
 $actualSpeed = trim($actualSpeed);
 
+
+$redboxContent = glob('/servers/redbox/*');
+$chooo7Content = glob('/servers/chooo7/*');
+
 $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /servers/redbox/downloaded';
 
+/*
+ http://www.audioproducts.com.au/downloadcenter/products/Denon/CEOLPICCOLOBK/Manuals/DRAN5_RCDN8_PROTOCOL_V.1.0.0.pdf
+ */
 
 ?>
 <html>
@@ -61,32 +121,68 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
     
     
     <div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			 <h2>Actuel download preload speed : <?php echo $actualSpeed; ?></h2>
-			<div class="btn-group">
-				<button class="btn btn-default doACtion" type="button" data-do="downloadSpeedSlow">
-					<em class="glyphicon"></em> Slow speed
-				</button> 
-				<button class="btn btn-default doACtion" type="button" data-do="downloadSpeedNormal">
-					<em class="glyphicon"></em> Normal speed
-				</button> 
-				<button class="btn btn-default doACtion" type="button" data-do="downloadSpeedHigh">
-					<em class="glyphicon"></em> High speed
-				</button> 
-			</div>
-			
-			
-			<h2>
-				Logs
-			</h2>
-			<p>
-				<?php echo implode("\n<br />", $lastLogs); ?>
-			</p>
-			
-		</div>
-	</div>
-</div>
+      <div class="row">
+        <div class="col-md-12">
+          <?php if(empty($redboxContent)): ?>
+            <h1 class="alert error">La REDBOX n'est pas montée</h1>
+            <hr />
+          <?php endif; ?>
+          <?php if(empty($chooo7Content)): ?>
+            <h1 class="alert error">ChoOo7 n'est pas montée</h1>
+            <hr />
+          <?php endif; ?>
+          
+          <h2>Ampli : <?php echo $powerState; ?> - <?php echo $currentInput; ?></h2>
+
+          <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="powerOn">
+              <em class="glyphicon"></em> POWER ON
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="powerOff">
+              <em class="glyphicon"></em> POWER OFF
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="volumeUp">
+              <em class="glyphicon"></em> Volume +
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="volumeDown">
+              <em class="glyphicon"></em> Volume -
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="setRadio">
+              <em class="glyphicon"></em> INTERNET
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="setBluetooth">
+              <em class="glyphicon"></em> Set Bluetooth
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="setCable">
+              <em class="glyphicon"></em> Cable
+            </button>
+          </div>
+          
+          <h2>Actuel download preload speed : <?php echo $actualSpeed; ?></h2>
+          
+          <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="downloadSpeedSlow">
+              <em class="glyphicon"></em> Slow speed
+            </button> 
+            <button class="btn btn-default doAction" type="button" data-do="downloadSpeedNormal">
+              <em class="glyphicon"></em> Normal speed
+            </button> 
+            <button class="btn btn-default doAction" type="button" data-do="downloadSpeedHigh">
+              <em class="glyphicon"></em> High speed
+            </button> 
+          </div>
+          
+          
+          <h2>
+            Logs
+          </h2>
+          <p>
+            <?php echo implode("\n<br />", $lastLogs); ?>
+          </p>
+          
+        </div>
+      </div>
+    </div>
 <script type="text/javascript">
 jQuery(function(){
     jQuery('.doAction').click(function() {

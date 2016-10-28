@@ -19,9 +19,11 @@ switch($action)
         exec($command);
         break;
 }
-
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 $lastLogs = array();
-exec("tail -n 20 /tmp/preloadLog", $lastLogs);
+$cmd = "tail -n 20 /var/home/raspberry/preloadLog";
+exec($cmd, $lastLogs);
 
 foreach($lastLogs as $k=>$line)
 {
@@ -40,7 +42,7 @@ if(file_exists($speedConfigDir."bandwidthNow"))
 }
 $actualSpeed = trim($actualSpeed);
 
-$simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /servers/redbox/downloaded';
+$simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /media/data/downloaded';
 
 
 ?>

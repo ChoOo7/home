@@ -1,88 +1,20 @@
 <?php
 $action=$_GET['action'];
+$param=$_GET['param'];
 
 function ampliSetInputSource()
 {
   
 }
-
-switch($action)
+if($action)
 {
-  case "downloadSpeedSlow":
-      $downloadSpeed = 200;
-      $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
-      var_dump($command);
-      exec($command);
-      break;
-  case "downloadSpeedHigh":
-      $downloadSpeed = 50000;
-      $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
-      exec($command);
-      break;
-  case "downloadSpeedNormal":
-    $downloadSpeed = 2000;
-    $command = 'php /var/home/raspberry/preloadResetCurrentSpeed.php';
-    exec($command);
-    break;
-
-  case "powerOn":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutSystem_OnStandby/ON&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_OnOff/ON&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;
+  header('Location: '.basename(__FILE__));
   
-  case "powerOff":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutSystem_OnStandby/STANDBY&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;
+  $cmd = 'nohup php '.__DIR__.'/homecmd.php '.escapeshellarg($action).' '.escapeshellarg($param).' &';
+  echo "\n".$cmd."\n";
+  passthru($cmd);
   
-  case "volumeUp":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutMasterVolumeBtn\>&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;
-
-  case "volumeDown":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutMasterVolumeBtn\<&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;
-  case "volumeSet":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutMasterVolumeSet/10&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;
-  
-  case "setInternet":
-  case "setRadio":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/IRADIO&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;
-    
-  
-  case "setFavorite1":
-    $command = 'curl -i http://192.168.0.120/goform/formiPhoneAppFavorite_Call.xml?01';
-    exec($command);
-    break;
-  case "setFavorite2":
-    $command = 'curl -i http://192.168.0.120/goform/formiPhoneAppFavorite_Call.xml?02';
-    exec($command);
-    break;
-  case "setFavorite3":
-    $command = 'curl -i http://192.168.0.120/goform/formiPhoneAppFavorite_Call.xml?03';
-    exec($command);
-    break;
-
-  case "setBluetooth":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/BLUETOOTH&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;
-
-  case "setCable":
-    $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/ANALOGIN&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
-    exec($command);
-    break;  
-    
-//http://www.openremote.org/display/docs/OpenRemote+2.0+How+To+-+Denon+HTTP+Control
-    
+  exit;
 }
 
 $stateXmlString = file_get_contents("http://192.168.0.120/goform/formMainZone_MainZoneXml.xml");
@@ -114,6 +46,7 @@ $actualSpeed = trim($actualSpeed);
 
 $downloadedContent = glob('/media/data/downloaded/*');
 $chooo7Content = glob('/servers/chooo7/*');
+$acerContent = glob('/servers/acer/*');
 
 $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /media/data/downloaded';
 
@@ -141,8 +74,8 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-12">
-          <?php if(empty($redboxContent)): ?>
-            <h1 class="alert error">La REDBOX n'est pas montée</h1>
+          <?php if(empty($acerContent)): ?>
+            <h1 class="alert error">ACER n'est pas montée</h1>
             <hr />
           <?php endif; ?>
           <?php if(empty($chooo7Content)): ?>
@@ -165,23 +98,35 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <button class="btn btn-default doAction" type="button" data-do="volumeDown">
               <em class="glyphicon"></em> Volume -
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setRadio">
+            <button class="btn btn-default doAction" type="button" data-do="radio">
               <em class="glyphicon"></em> INTERNET
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setBluetooth">
+            <button class="btn btn-default doAction" type="button" data-do="bluetooth">
               <em class="glyphicon"></em> Set Bluetooth
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setCable">
+            <button class="btn btn-default doAction" type="button" data-do="analogic">
               <em class="glyphicon"></em> Cable
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setFavorite1">
+            <button class="btn btn-default doAction" type="button" data-do="inter">
+              <em class="glyphicon"></em> France Inter
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="fip">
+              <em class="glyphicon"></em> FIP
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="setFavorite" data-param="01">
               <em class="glyphicon"></em> FAV1
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setFavorite2">
+            <button class="btn btn-default doAction" type="button" data-do="setFavorite" data-param="02">
               <em class="glyphicon"></em> FAV2
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setFavorite3">
+            <button class="btn btn-default doAction" type="button" data-do="setFavorite" data-param="03">
               <em class="glyphicon"></em> FAV3
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="comptine">
+              <em class="glyphicon"></em> Comptine
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="croc">
+              <em class="glyphicon"></em> Crocodile
             </button>
           </div>
           
@@ -213,7 +158,7 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
 <script type="text/javascript">
 jQuery(function(){
     jQuery('.doAction').click(function() {
-        document.location='<?php echo basename(__FILE__); ?>?action='+jQuery(this).attr('data-do');
+        document.location='<?php echo basename(__FILE__); ?>?action='+jQuery(this).attr('data-do')+'&param='+jQuery(this).attr('data-param');
         return false;
     });
 });

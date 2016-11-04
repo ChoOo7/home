@@ -17,6 +17,7 @@ if($action)
   exit;
 }
 
+
 $stateXmlString = file_get_contents("http://192.168.0.120/goform/formMainZone_MainZoneXml.xml");
 $stateXml = simplexml_load_string($stateXmlString);
 $powerState = (string)$stateXml->Power->value;

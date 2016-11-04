@@ -12,7 +12,7 @@ if(file_exists($bandwidthNowFilePath))
     $bandwidth = trim(file_get_contents($bandwidthNowFilePath));
 }
 //--backup --partial --inplace 
-$command = "rsync --timeout=115 --partial --inplace --append --recursive --bwlimit=".$bandwidth." -vP  -e 'ssh -p 11122' /servers/chooo7/var/downloaded/ /servers/redbox/downloaded";
+$command = "rsync --timeout=115 --partial --inplace --append --recursive --bwlimit=".$bandwidth." -vP  /servers/chooo7/var/downloaded/ /media/data/downloaded";
 $command = 'timeout 175 '.$command;
 
 echo "\n".date('d/m/Y H:i:s');

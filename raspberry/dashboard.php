@@ -1,20 +1,26 @@
 <?php
 $action=$_GET['action'];
+
+function ampliSetInputSource()
+{
+  
+}
+
 switch($action)
 {
-    case "downloadSpeedSlow":
-        $downloadSpeed = 200;
-        $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
-        var_dump($command);
-        exec($command);
-        break;
-    case "downloadSpeedHigh":
-        $downloadSpeed = 20000;
-        $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
-        exec($command);
-        break;
+  case "downloadSpeedSlow":
+      $downloadSpeed = 200;
+      $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
+      var_dump($command);
+      exec($command);
+      break;
+  case "downloadSpeedHigh":
+      $downloadSpeed = 50000;
+      $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
+      exec($command);
+      break;
   case "downloadSpeedNormal":
-    $downloadSpeed = 200;
+    $downloadSpeed = 2000;
     $command = 'php /var/home/raspberry/preloadResetCurrentSpeed.php';
     exec($command);
     break;
@@ -50,6 +56,20 @@ switch($action)
     $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/IRADIO&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
     exec($command);
     break;
+    
+  
+  case "setFavorite1":
+    $command = 'curl -i http://192.168.0.120/goform/formiPhoneAppFavorite_Call.xml?01';
+    exec($command);
+    break;
+  case "setFavorite2":
+    $command = 'curl -i http://192.168.0.120/goform/formiPhoneAppFavorite_Call.xml?02';
+    exec($command);
+    break;
+  case "setFavorite3":
+    $command = 'curl -i http://192.168.0.120/goform/formiPhoneAppFavorite_Call.xml?03';
+    exec($command);
+    break;
 
   case "setBluetooth":
     $command = 'curl -i --data '.escapeshellarg('cmd0=PutZone_InputFunction/BLUETOOTH&ZoneName=MainZone').' http://192.168.0.120/MainZone/index.put.asp';
@@ -66,15 +86,13 @@ switch($action)
 }
 
 $stateXmlString = file_get_contents("http://192.168.0.120/goform/formMainZone_MainZoneXml.xml");
-//var_dump($stateXmlString);
 $stateXml = simplexml_load_string($stateXmlString);
-//var_dump($stateXml);
 $powerState = (string)$stateXml->Power->value;
 $currentInput = (string)$stateXml->InputFuncSelect->value;
 
 
 $lastLogs = array();
-exec("tail -n 20 /tmp/preloadLog", $lastLogs);
+exec("tail -n 10 /var/home/raspberry/preloadLog", $lastLogs);
 
 foreach($lastLogs as $k=>$line)
 {
@@ -94,10 +112,10 @@ if(file_exists($speedConfigDir."bandwidthNow"))
 $actualSpeed = trim($actualSpeed);
 
 
-$redboxContent = glob('/servers/redbox/*');
+$downloadedContent = glob('/media/data/downloaded/*');
 $chooo7Content = glob('/servers/chooo7/*');
 
-$simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /servers/redbox/downloaded';
+$simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /media/data/downloaded';
 
 /*
  http://www.audioproducts.com.au/downloadcenter/products/Denon/CEOLPICCOLOBK/Manuals/DRAN5_RCDN8_PROTOCOL_V.1.0.0.pdf
@@ -155,6 +173,15 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             </button>
             <button class="btn btn-default doAction" type="button" data-do="setCable">
               <em class="glyphicon"></em> Cable
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="setFavorite1">
+              <em class="glyphicon"></em> FAV1
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="setFavorite2">
+              <em class="glyphicon"></em> FAV2
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="setFavorite3">
+              <em class="glyphicon"></em> FAV3
             </button>
           </div>
           

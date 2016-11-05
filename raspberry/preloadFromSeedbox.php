@@ -13,7 +13,7 @@ if(file_exists($bandwidthNowFilePath))
 }
 //--backup --partial --inplace 
 
-$command = "rsync --timeout=115 --partial --inplace --append --recursive --bwlimit=".$bandwidth." -vP  /servers/chooo7/var/downloaded/ /media/data/downloaded";
+$command = "rsync --timeout=115 --partial --inplace --append --recursive --bwlimit=".$bandwidth." -vP --no-o  /servers/chooo7/var/downloaded/ /media/data/downloaded";
 
 echo "\n".date('d/m/Y H:i:s');
 echo "\n".$command;

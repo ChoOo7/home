@@ -3,6 +3,7 @@ class Kodi
 {
 
   protected $debug = false;
+  protected $i = 1;
 
   public function getIp()
   {
@@ -41,21 +42,21 @@ class Kodi
 
   public function clearPlaylist()
   {
-    $cmd = '{"jsonrpc":"2.0","method":"Playlist.Clear","id":1,"params":[0]}';
+    $cmd = '{"jsonrpc":"2.0","method":"Playlist.Clear","id":'.($this->i++).',"params":[0]}';
     $url = "/jsonrpc";
     $this->sendCommand($url, $cmd, false);
   }
 
   public function addArtistToPlaylist($artistId)
   {
-    $cmd = '{"jsonrpc":"2.0","method":"Playlist.Add","id":1,"params":[0,{"artistid":'.$artistId.'}]}';
+    $cmd = '{"jsonrpc":"2.0","method":"Playlist.Add","id":'.($this->i++).',"params":[0,{"artistid":'.$artistId.'}]}';
     $url = "/jsonrpc";
     $this->sendCommand($url, $cmd, false);
   }
 
   public function addSongToPlaylist($songId)
   {
-    $cmd = '{"jsonrpc":"2.0","method":"Playlist.Add","id":1,"params":[0,{"songid":'.$songId.'}]}';
+    $cmd = '{"jsonrpc":"2.0","method":"Playlist.Add","id":'.($this->i++).',"params":[0,{"songid":'.$songId.'}]}';
     $url = "/jsonrpc";
     $this->sendCommand($url, $cmd, false);
   }
@@ -63,14 +64,21 @@ class Kodi
 
   public function playPlaylist()
   {
-    $cmd = '{"jsonrpc":"2.0","method":"Player.Open","id":1,"params":[{"playlistid":0,"position":0}]}';
+    $cmd = '{"jsonrpc":"2.0","method":"Player.Open","id":'.($this->i++).',"params":[{"playlistid":0,"position":0}]}';
     $url = "/jsonrpc";
     $this->sendCommand($url, $cmd, false);
   }
   
   public function setShuffle()
   {
-    $cmd = '{"jsonrpc":"2.0","method":"Player.SetShuffle","id":1,"params":[0,"toggle"]}';
+    $cmd = '{"jsonrpc":"2.0","method":"Player.SetShuffle","id":'.($this->i++).',"params":[0,true]}';
+    $url = "/jsonrpc";
+    $this->sendCommand($url, $cmd, false);
+  }
+  
+  public function stop()
+  {
+    $cmd = '{"jsonrpc":"2.0","method":"Player.Stop","id":'.($this->i++).',"params":[0]}';
     $url = "/jsonrpc";
     $this->sendCommand($url, $cmd, false);
   }

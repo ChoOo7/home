@@ -69,6 +69,11 @@ switch($cmd)
   case "powerOff":
     $d->powerOff();
     break;
+  
+  case "stp":
+  case "stop":
+    $k->stop();
+    break;
   case "radio":
   case "tuner":
     $d->powerOnAndWaitForRead();
@@ -132,29 +137,47 @@ switch($cmd)
     $k->addArtistToPlaylist($param);
     $k->playPlaylist();
     break;
+    
+  case "c":
+  case "cc":
+  case "clr":
+  case "clear":
+  case "clearPlaylist":
+    $k->clearPlaylist();    
+    break;
+    
   case "cpt":
   case "comptine":
   case "comptines":
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
+    $d->volumeSet(15);    
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(2);
     $k->setShuffle();
     $k->playPlaylist();
-    $d->volumeSet(20);
+    $k->setShuffle();
+    $d->volumeSet(15);
     break;
     
   case "croc":
   case "crocodile":
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
+    $d->volumeSet(15);
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addSongToPlaylist(5033);
     $k->setShuffle();
     $k->playPlaylist();
-    $d->volumeSet(20);
+    $d->volumeSet(15);
+    break;
+    
+    
+  case "shuffle":
+  case "random":
+    $k->setShuffle();
     break;
 
 }

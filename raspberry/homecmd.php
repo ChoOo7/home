@@ -12,22 +12,25 @@ switch($cmd)
 {
 
   case "downloadSpeedSlow":
+  case "slow":
     $downloadSpeed = 200;
     $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
-    exec($command);
+    passthru($command);
     break;
 
   case "downloadSpeedHigh":
+  case "quick":
     $downloadSpeed = 50000;
     $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
-    exec($command);
+    passthru($command);
     break;
 
 
   case "downloadSpeedNormal":
+  case "normal":
     $downloadSpeed = 2000;
     $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
-    exec($command);
+    passthru($command);
     break;
   
   case "+":
@@ -67,6 +70,7 @@ switch($cmd)
   case "off":
   case "of":
   case "powerOff":
+    $k->stop();
     $d->powerOff();
     break;
   
@@ -76,6 +80,7 @@ switch($cmd)
     break;
   case "radio":
   case "tuner":
+  $k->stop();
     $d->powerOnAndWaitForRead();
     $d->setRadio();
     $d->setVolume(15);
@@ -83,6 +88,7 @@ switch($cmd)
   case "favorite":
   case "setFavorite":
   case "fav":
+    $k->stop();
     $d->powerOnAndWaitForRead();
     $d->setFavorite($param);
     break;
@@ -90,13 +96,35 @@ switch($cmd)
   case "france":
   case "inter":
   case "franceinter":
+    $k->stop();
     $d->powerOnAndWaitForRead();
     $d->setFavorite("01");
     break;
   case "fip":
-    $d->powerOnAndWaitForRead();
+    $k->stop();
+    $d->powerOnAndWaitForRead(array($d, 'setFavorite'), array("01"));
     $d->setFavorite("02");
     break;
+  case "rtu":
+    $k->stop();
+    $d->powerOnAndWaitForRead();
+    $d->setFavorite("03");
+    break;
+
+  case "chantefrance":
+    $k->stop();
+    $d->powerOnAndWaitForRead(array($d, 'setFavorite'), array("04"));
+    $d->setFavorite("04");
+    break;
+  case "meuh":
+  case "mheu":
+  case "meu":
+  case "me":
+    $k->stop();
+    $d->powerOnAndWaitForRead();
+    $d->setFavorite("12");
+    break;
+  
   case "vol":
   case "volume":
   case "getVolume":
@@ -112,12 +140,14 @@ switch($cmd)
     break;
   case "blue":
   case "bluetooth":
+    $k->stop();
     $d->powerOnAndWaitForRead();
     $d->setBluetooth();
     break;
   case "analogic":
   case "ana":
   case "an":
+    $k->stop();
     $d->powerOnAndWaitForRead();
     $d->setAnalogIn();
     break;
@@ -160,7 +190,8 @@ switch($cmd)
     $k->setShuffle();
     $d->volumeSet(15);
     break;
-    
+
+
   case "croc":
   case "crocodile":
     $d->powerOnAndWaitForRead();
@@ -168,16 +199,70 @@ switch($cmd)
     $d->volumeSet(15);
     $k->clearPlaylist();
     $k->setShuffle();
-    $k->addSongToPlaylist(5033);
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'croco') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
+
+
+    $k->addSongToPlaylist($songId);
     $k->setShuffle();
     $k->playPlaylist();
     $d->volumeSet(15);
     break;
-    
-    
+
+
+  case "fourmis":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'fourmis') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
+
+
+    $k->addSongToPlaylist($songId);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $d->volumeSet(15);
+    break;
+
+
   case "shuffle":
   case "random":
     $k->setShuffle();
+    break;
+
+  case "noshuffle":
+  case "norandom":
+    $k->setShuffle(false);
+    break;
+
+
+  case "clean":
+    $k->clean();
+    break;
+  case "scan":
+    $k->scan();
     break;
 
 }

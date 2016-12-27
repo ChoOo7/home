@@ -46,7 +46,7 @@ class MyDenon
     return $isOff;
   }
   
-  public function powerOnAndWaitForRead()
+  public function powerOnAndWaitForRead($callback = null, $callbackParams = array())
   {
     $isOff = $this->isPowerOff();
     if($isOff)
@@ -55,8 +55,10 @@ class MyDenon
       
       $lastVol = $this->getVolumeLevel();
       $volumeChanged = false;
-      while( ! $volumeChanged)
+      $counter = 0;
+      while( ! $volumeChanged && $counter < 100)
       {
+        $counter++;
         $this->volumeUp(false);
         sleep(1);
         $vol = $this->getVolumeLevel();        
@@ -66,7 +68,11 @@ class MyDenon
         {
           $this->volumeSet(6);
         }else{
-          $this->volumeSet(1);
+          $this->volumeSet(10);
+        }
+        if($callback && $counter == 3)
+        {
+          call_user_func_array($callback, $callbackParams);
         }
       }
     }
@@ -147,6 +153,7 @@ class MyDenon
   
   public function setFavorite($favNumber="01")
   {
+    $this->setRadio();
     $cmd = "";
     $url = "/goform/formiPhoneAppFavorite_Call.xml?".$favNumber;
     $this->sendCommand($url, $cmd);

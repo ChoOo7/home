@@ -1,4 +1,8 @@
 <?php
+require_once(__DIR__.'/denon.class.php');
+require_once(__DIR__.'/kodi.class.php');
+
+
 $action=$_GET['action'];
 $param=$_GET['param'];
 
@@ -18,10 +22,9 @@ if($action)
 }
 
 
-$stateXmlString = file_get_contents("http://192.168.0.120/goform/formMainZone_MainZoneXml.xml");
-$stateXml = simplexml_load_string($stateXmlString);
-$powerState = (string)$stateXml->Power->value;
-$currentInput = (string)$stateXml->InputFuncSelect->value;
+$d = new MyDenon();
+$state = $d->getState();
+$denonState = $state->Power->value.' - '.$state->InputFuncSelect->value. ' - Vol: '.$d->getVolumeLevel();
 
 
 $lastLogs = array();
@@ -47,7 +50,8 @@ $actualSpeed = trim($actualSpeed);
 
 $downloadedContent = glob('/media/data/downloaded/*');
 $chooo7Content = glob('/servers/chooo7/*');
-$acerContent = glob('/servers/acer/*');
+$anthoContent = glob('/servers/antho/*');
+$anthoSambaContent = glob('/servers/antho/home/simon/samba_simon/*');
 
 $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /media/data/downloaded';
 
@@ -60,14 +64,15 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
     <head>
     <title>Home control center</title>
     <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified JavaScript -->
+      <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
     </head>
     <body>
     
@@ -75,8 +80,13 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-12">
-          <?php if(empty($acerContent)): ?>
-            <h1 class="alert error">ACER n'est pas montée</h1>
+          <?php if(empty($anthoContent)): ?>
+            <h1 class="alert error">ANTHO n'est pas montée</h1>
+            <hr />
+          <?php endif; ?>
+
+          <?php if(empty($anthoSambaContent)): ?>
+            <h1 class="alert error">ANTHO SAMBA n'est pas montée</h1>
             <hr />
           <?php endif; ?>
           <?php if(empty($chooo7Content)): ?>
@@ -84,7 +94,7 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <hr />
           <?php endif; ?>
           
-          <h2>Ampli : <?php echo $powerState; ?> - <?php echo $currentInput; ?></h2>
+          <h2>Ampli : <?php echo $denonState; ?></h2>
 
           <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="powerOn">
@@ -93,20 +103,24 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <button class="btn btn-default doAction" type="button" data-do="powerOff">
               <em class="glyphicon"></em> POWER OFF
             </button>
+          </div>
+          <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="volumeUp">
               <em class="glyphicon"></em> Volume +
             </button>
             <button class="btn btn-default doAction" type="button" data-do="volumeDown">
               <em class="glyphicon"></em> Volume -
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="radio">
-              <em class="glyphicon"></em> INTERNET
-            </button>
+          </div>
+          <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="bluetooth">
-              <em class="glyphicon"></em> Set Bluetooth
+              <em class="glyphicon"></em> Bluetooth
             </button>
             <button class="btn btn-default doAction" type="button" data-do="analogic">
               <em class="glyphicon"></em> Cable
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="digit">
+              <em class="glyphicon"></em> DIGIT
             </button>
             <button class="btn btn-default doAction" type="button" data-do="inter">
               <em class="glyphicon"></em> France Inter
@@ -114,20 +128,31 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <button class="btn btn-default doAction" type="button" data-do="fip">
               <em class="glyphicon"></em> FIP
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setFavorite" data-param="01">
-              <em class="glyphicon"></em> FAV1
+            <button class="btn btn-default doAction" type="button" data-do="meuf">
+              <em class="glyphicon"></em> MEUH
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setFavorite" data-param="02">
-              <em class="glyphicon"></em> FAV2
+            <button class="btn btn-default doAction" type="button" data-do="tru">
+              <em class="glyphicon"></em> RTU
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="setFavorite" data-param="03">
-              <em class="glyphicon"></em> FAV3
+            <button class="btn btn-default doAction" type="button" data-do="chantefrance">
+              <em class="glyphicon"></em> CHANTEFRANCE
             </button>
+          </div>
+          <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="comptine">
               <em class="glyphicon"></em> Comptine
             </button>
             <button class="btn btn-default doAction" type="button" data-do="croc">
               <em class="glyphicon"></em> Crocodile
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="fourmis">
+              <em class="glyphicon"></em> Fourmis
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="clean">
+              <em class="glyphicon"></em> Clean
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="scan">
+              <em class="glyphicon"></em> Scan
             </button>
           </div>
           
@@ -157,12 +182,22 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
       </div>
     </div>
 <script type="text/javascript">
-jQuery(function(){
-    jQuery('.doAction').click(function() {
-        document.location='<?php echo basename(__FILE__); ?>?action='+jQuery(this).attr('data-do')+'&param='+jQuery(this).attr('data-param');
-        return false;
-    });
-});
+
+    function reloadPage()
+    {
+      document.location = document.location;
+    }
+    jQuery(function(){
+      jQuery('.doAction').click(function() {
+          jQuery.ajax('<?php echo basename(__FILE__); ?>?action='+jQuery(this).attr('data-do')+'&param='+jQuery(this).attr('data-param'), {
+            success: function() {
+             document.location = document.location;
+            }
+          });
+          return false;
+      });
+      setTimeout('reloadPage();', 10000);
+  });
 </script>
     
     

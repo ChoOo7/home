@@ -104,6 +104,10 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
               <em class="glyphicon"></em> POWER OFF
             </button>
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
           <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="volumeUp">
               <em class="glyphicon"></em> Volume +
@@ -112,6 +116,10 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
               <em class="glyphicon"></em> Volume -
             </button>
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
           <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="bluetooth">
               <em class="glyphicon"></em> Bluetooth
@@ -138,6 +146,10 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
               <em class="glyphicon"></em> CHANTEFRANCE
             </button>
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
           <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="comptine">
               <em class="glyphicon"></em> Comptine

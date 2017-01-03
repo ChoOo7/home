@@ -106,6 +106,7 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
           </div>
         </div>
       </div>
+      <br />
       <div class="row">
         <div class="col-md-12">
           <div class="btn-group">
@@ -118,6 +119,7 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
           </div>
         </div>
       </div>
+      <br />
       <div class="row">
         <div class="col-md-12">
           <div class="btn-group">
@@ -148,6 +150,7 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
           </div>
         </div>
       </div>
+      <br />
       <div class="row">
         <div class="col-md-12">
           <div class="btn-group">

@@ -12,7 +12,7 @@ class MyDenon
   {
     $fullUrl = 'http://'.$this->getIp().''.$url;
     $data = $cmd ? '--data-binary '.escapeshellarg($cmd) : '';
-    $cmd = 'curl -s -H \'Content-Type: text/xml; charset="utf-8"\' '.$data.' '.escapeshellarg($fullUrl).' 2>&1';
+    $cmd = 'timeout 3 curl -s -H \'Content-Type: text/xml; charset="utf-8"\' '.$data.' '.escapeshellarg($fullUrl).' 2>&1';
     if($async)
     {
       $cmd = ''.$cmd.' &';

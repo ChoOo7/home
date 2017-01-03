@@ -116,13 +116,14 @@ switch($cmd)
     $d->powerOnAndWaitForRead(array($d, 'setFavorite'), array("04"));
     $d->setFavorite("04");
     break;
+    
   case "meuh":
   case "mheu":
   case "meu":
   case "me":
-    $k->stop();
     $d->powerOnAndWaitForRead();
-    $d->setFavorite("12");
+    $d->setFavorite("14");
+    $k->stop();
     break;
   
   case "vol":

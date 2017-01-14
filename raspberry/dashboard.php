@@ -163,6 +163,21 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <button class="btn btn-default doAction" type="button" data-do="fourmis">
               <em class="glyphicon"></em> Fourmis
             </button>
+            <button class="btn btn-default doAction" type="button" data-do="alphabet">
+              <em class="glyphicon"></em> Alphabet
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="dodoenfant">
+              <em class="glyphicon"></em> Dodo
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="cerf">
+              <em class="glyphicon"></em> Cerf
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="michel">
+              <em class="glyphicon"></em> Michel
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="gipsy">
+              <em class="glyphicon"></em> Gipsy
+            </button>
             <button class="btn btn-default doAction" type="button" data-do="clean">
               <em class="glyphicon"></em> Clean
             </button>
@@ -170,22 +185,22 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
               <em class="glyphicon"></em> Scan
             </button>
           </div>
-          
+
           <h2>Actuel download preload speed : <?php echo $actualSpeed; ?></h2>
-          
+
           <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="downloadSpeedSlow">
               <em class="glyphicon"></em> Slow speed
-            </button> 
+            </button>
             <button class="btn btn-default doAction" type="button" data-do="downloadSpeedNormal">
               <em class="glyphicon"></em> Normal speed
-            </button> 
+            </button>
             <button class="btn btn-default doAction" type="button" data-do="downloadSpeedHigh">
               <em class="glyphicon"></em> High speed
-            </button> 
+            </button>
           </div>
-          
-          
+
+
           <h2>
             Logs
           </h2>

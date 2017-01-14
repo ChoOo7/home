@@ -158,6 +158,7 @@ switch($cmd)
   case "di":
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
+    $d->volumeSet(15);
     break;
   case "a":
   case "artist":
@@ -182,7 +183,7 @@ switch($cmd)
   case "comptines":
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
-    $d->volumeSet(15);    
+    $d->volumeSet(15);
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(2);
@@ -240,6 +241,162 @@ switch($cmd)
       }
     }
 
+
+    $k->addSongToPlaylist($songId);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $d->volumeSet(15);
+    break;
+
+
+  case "fourmis":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'fourmis') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
+
+
+    $k->addSongToPlaylist($songId);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $d->volumeSet(15);
+    break;
+
+  case "alphabet":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'alphabet') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
+
+    $k->addSongToPlaylist($songId);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $d->volumeSet(15);
+    break;
+
+  case "dodoenfant":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'dodo') !== false && stripos($song['label'], 'enfant') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
+
+    $k->addSongToPlaylist($songId);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $d->volumeSet(15);
+    break;
+
+
+  case "cerf":
+  case "cerfs":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'cerf') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
+
+    $k->addSongToPlaylist($songId);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $d->volumeSet(15);
+    break;
+
+  case "michel":
+  case "michele":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'Michel') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
+
+    $k->addSongToPlaylist($songId);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $d->volumeSet(15);
+    break;
+
+  case "gipsy":
+  case "gypsi":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+
+    $artistId = 2;
+    $songId = null;
+    $songs = $k->getSongsOfArtist($artistId);
+    foreach($songs as $song)
+    {
+      if(stripos($song['label'], 'gipsy') !== false)
+      {
+        $songId = $song['songid'];
+        break;
+      }
+    }
 
     $k->addSongToPlaylist($songId);
     $k->setShuffle();

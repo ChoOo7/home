@@ -138,10 +138,10 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <button class="btn btn-default doAction" type="button" data-do="fip">
               <em class="glyphicon"></em> FIP
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="meuf">
+            <button class="btn btn-default doAction" type="button" data-do="meuh">
               <em class="glyphicon"></em> MEUH
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="tru">
+            <button class="btn btn-default doAction" type="button" data-do="rtu">
               <em class="glyphicon"></em> RTU
             </button>
             <button class="btn btn-default doAction" type="button" data-do="chantefrance">
@@ -154,6 +154,9 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
       <div class="row">
         <div class="col-md-12">
           <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="ours">
+              <em class="glyphicon"></em> Ours
+            </button>
             <button class="btn btn-default doAction" type="button" data-do="comptine">
               <em class="glyphicon"></em> Comptine
             </button>

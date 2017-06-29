@@ -106,6 +106,7 @@ switch($cmd)
     $d->setFavorite("02");
     break;
   case "rtu":
+  case "tru":
     $k->stop();
     $d->powerOnAndWaitForRead();
     $d->setFavorite("03");
@@ -116,8 +117,9 @@ switch($cmd)
     $d->powerOnAndWaitForRead(array($d, 'setFavorite'), array("04"));
     $d->setFavorite("04");
     break;
-    
+
   case "meuh":
+  case "meuf":
   case "mheu":
   case "meu":
   case "me":
@@ -129,7 +131,7 @@ switch($cmd)
   case "vol":
   case "volume":
   case "getVolume":
-    echo "\n".$d->getBluetooth()."\n";
+    echo "\n".$d->getVolumeLevel()."\n";
     break;
   case "st":
   case "state":
@@ -249,27 +251,23 @@ switch($cmd)
     break;
 
 
-  case "fourmis":
+  case "ours":
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
     $k->clearPlaylist();
     $k->setShuffle();
 
-    $artistId = 2;
+    $artistId = 816;
     $songId = null;
     $songs = $k->getSongsOfArtist($artistId);
     foreach($songs as $song)
     {
-      if(stripos($song['label'], 'fourmis') !== false)
-      {
-        $songId = $song['songid'];
-        break;
-      }
+      $k->addSongToPlaylist($songId);
     }
 
 
-    $k->addSongToPlaylist($songId);
+    
     $k->setShuffle();
     $k->playPlaylist();
     $d->volumeSet(15);

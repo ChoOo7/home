@@ -51,7 +51,7 @@ $actualSpeed = trim($actualSpeed);
 $downloadedContent = glob('/media/data/downloaded/*');
 $chooo7Content = glob('/servers/chooo7/*');
 $anthoContent = glob('/servers/antho/*');
-$anthoSambaContent = glob('/servers/antho/home/simon/samba_simon/*');
+$anthoSambaContent = glob('/servers/antho/home/simon/samba/*');
 
 $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /media/data/downloaded';
 

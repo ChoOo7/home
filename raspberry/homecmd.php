@@ -179,7 +179,7 @@ switch($cmd)
   case "clearPlaylist":
     $k->clearPlaylist();    
     break;
-    
+
   case "cpt":
   case "comptine":
   case "comptines":
@@ -189,6 +189,51 @@ switch($cmd)
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(2);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+  case "tro":
+  case "trotro":
+  case "troTro":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(822);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+
+  case "tata":
+  case "marthe":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(820);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+  case "oui":
+  case "ouioui":
+  case "ouiOui":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(821);
     $k->setShuffle();
     $k->playPlaylist();
     $k->setShuffle();

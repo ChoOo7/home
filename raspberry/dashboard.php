@@ -154,6 +154,9 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
       <div class="row">
         <div class="col-md-12">
           <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="tata">
+              <em class="glyphicon"></em> Tata Marthe
+            </button>
             <button class="btn btn-default doAction" type="button" data-do="ours">
               <em class="glyphicon"></em> Ours
             </button>
@@ -181,6 +184,19 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <button class="btn btn-default doAction" type="button" data-do="gipsy">
               <em class="glyphicon"></em> Gipsy
             </button>
+          </div>
+
+
+          <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="ouioui">
+              <em class="glyphicon"></em> Oui oui
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="trotro">
+              <em class="glyphicon"></em> TroTro
+            </button>
+          </div>
+
+          <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="clean">
               <em class="glyphicon"></em> Clean
             </button>

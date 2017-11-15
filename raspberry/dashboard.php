@@ -185,6 +185,7 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
               <em class="glyphicon"></em> Gipsy
             </button>
           </div>
+          <br />
 
 
           <div class="btn-group">
@@ -195,6 +196,8 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
               <em class="glyphicon"></em> TroTro
             </button>
           </div>
+
+          <br />
 
           <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="clean">

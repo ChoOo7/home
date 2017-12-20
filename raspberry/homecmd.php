@@ -198,6 +198,12 @@ switch($cmd)
   case "tro":
   case "trotro":
   case "troTro":
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(822);
+    $k->setShuffle();
+    $k->playPlaylist();
+  
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);

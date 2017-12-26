@@ -2,7 +2,7 @@
 require_once(__DIR__.'/coinmon.class.php');
 $cm = new Coinmon();
 $infos = $cm->getCalculatedValues();
-$devices = array('TOTAL'=>array());
+$devices = array();
 $totalSeries = array();
 $last = array();
 $lastTotal = 0.0;
@@ -53,13 +53,12 @@ $charts[] = array(
 );
 
 foreach($charts as $chartIndex=>$chartDef) {
-  $devices = array('TOTAL'=>array());
+  $devices = array();
   $minTimestamp = $chartDef['minTimestamp'];
   $minInterval = $chartDef['minInterval'];
 
   $lastTimestamp = null;
-  $firstTotal = null;
-  $lastTotal = null;
+  $firstValue = null;
 
   foreach ($infos as $timestamp => $values) {
     $isFull = true;
@@ -79,46 +78,38 @@ foreach($charts as $chartIndex=>$chartDef) {
       if (!array_key_exists($device, $devices)) {
         $devices[$device] = array();
       }
-      if (false && $info["valueOfMyCoins"] == 0) {
+      if (false && $info["valueInEuro"] == 0) {
         $isFull = false;
         continue;
       }
-      $devices[$device][$timestamp] = $info["valueOfMyCoins"];
-      $total += $info["valueOfMyCoins"];
+      $devices[$device][$timestamp] = $info["valueInEuro"];
     }
-    if ($isFull) {
-      $devices['TOTAL'][$timestamp] = $total;
-      $last = $values;
-      if($firstTotal === null)
-      {
-        $firstTotal = $total;
+  }
+
+  $newDevices = array();
+  foreach($devices as $device=>$values) {
+    $newDevices[$device] = array();
+
+    $isFirst = true;
+    $refValue = null;
+
+    foreach ($values as $timestamp => $value) {
+      if ($isFirst) {
+        $refValue = $value;
+        //$value = 100;
+        $isFirst = false;
       }
-      $lastTotal = $total;
+      $newValue = (100 * $value) / $refValue;
+      $newDevices[$device][$timestamp] = $newValue;
     }
   }
-  $variation = ($lastTotal - $firstTotal) / $firstTotal;
-  $charts[$chartIndex]['devices'] = $devices;
-  $charts[$chartIndex]['variation'] = $variation;
+
+  $charts[$chartIndex]['devices'] = $newDevices;
 }
 
-$actualValues = array();
-
-foreach ($infos as $timestamp => $values) {
-  $isFull = true;
-  $total = 0.0;
-  $actualValues = array();
-  foreach ($values as $device => $info) {
-    if($info["valueOfMyCoins"]) {
-      $total += $info["valueOfMyCoins"];
-      $actualValues[$device] = $info["valueOfMyCoins"];
-    }
-  }
-}
-
-arsort($actualValues, SORT_NUMERIC);
 ?><html>
 <head>
-  <title>Coin control center - <?php echo $total; ?>€</title>
+  <title>Coin control center</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -138,25 +129,15 @@ arsort($actualValues, SORT_NUMERIC);
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
-      <h1>Total : <?php echo round($total, 2); ?>€</h1>
-      <?php foreach($actualValues as $crypto=>$value): ?>
-        <?php if($value >= 3): ?>
-          <?php
-          echo ' ( '.$crypto.' : '.round($value).' € ) ';
-          ?>
-        <?php endif; ?>
-      <?php endforeach; ?>
-
       <br />
       <?php foreach($charts as $chartIndex=>$chartInfo): ?>
         <?php
         $devices = $chartInfo['devices'];
         $name = $chartInfo['name'];
-        $variation = $chartInfo['variation'];
 
         ?>
         <div class="row">
-          <h2><?php echo $name; ?> | <?php echo round($variation*100, 2); ?>%</h2>
+          <h2><?php echo $name; ?></h2>
           <div class="col-md-2">&nbsp;</div>
           <div class="col-md-8">
             <canvas id="myChart<?php echo $chartIndex; ?>" style="width: 80%;height: 400px;"></canvas>
@@ -209,7 +190,7 @@ arsort($actualValues, SORT_NUMERIC);
                       var currencyLabel = dataSet[tooltipItem.datasetIndex].label;
                       var dt = new Date(tooltipItem.xLabel * 1000);
                       var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)+'/'+dt.getFullYear()+' '+dt.getHours()+':'+dt.getMinutes() ;
-                      return currencyLabel + ' : ' + Math.round(tooltipItem.yLabel)+' € on '+dateString;
+                      return currencyLabel + ' : ' + tooltipItem.yLabel+' % on '+dateString;
                   }
               }
           },
@@ -218,7 +199,7 @@ arsort($actualValues, SORT_NUMERIC);
                   ticks: {
                       beginAtZero:false,
                       callback: function(value, index, values) {
-                          return Math.round(value)+' €';
+                          return value+' %';
                       }
 
                   }

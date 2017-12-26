@@ -1,8 +1,16 @@
 <?php
 class Coinmon
 {
-  public function getCryptoValueInEuro($crypto)
+  public function getCryptoValueInEuro($crypto, $tryLeft = 5)
   {
+    if($crypto == "ZEUR")
+    {
+      return 1;
+    }
+    if($crypto == "XBT")
+    {
+      $crypto = "BTC";
+    }
     ob_start();
     $cmd = 'coinmon -c eur -f '.escapeshellarg($crypto).' | grep '.escapeshellarg($crypto);
     $output = array();
@@ -12,7 +20,15 @@ class Coinmon
 
     $output = implode("\n", $output);
     $tmp = explode('│', $output);
-    return (float)trim($tmp[2]);
+
+    $price = (float)trim($tmp[2]);
+    if($price == 0.0 && $tryLeft > 0)
+    {
+      var_dump($cmd);var_dump($output);
+      return $this->getCryptoValueInEuro($crypto, $tryLeft-1);
+    }
+
+    return $price;
   }
 
   public function saveCalculatedValues($values)

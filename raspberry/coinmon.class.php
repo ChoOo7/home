@@ -36,7 +36,7 @@ class Coinmon
     $fileName = __DIR__.DIRECTORY_SEPARATOR.'coinsInfo.json';
     $cnt = $this->getCalculatedValues();
     $cnt[time()]=$values;
-    file_put_contents($fileName, json_encode($cnt));
+    file_put_contents($fileName, json_encode($cnt, JSON_PRETTY_PRINT));
   }
 
   public function getCalculatedValues()

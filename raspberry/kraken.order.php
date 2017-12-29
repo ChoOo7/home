@@ -6,7 +6,7 @@ require_once(__DIR__.'/coinmon.class.php');
 
 require_once(__DIR__.'/kraken.class.php');
 require_once(__DIR__.'/binance.class.php');
-
+die('deactivated');
 
 $cm = new Coinmon();
 

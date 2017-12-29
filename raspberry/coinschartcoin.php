@@ -7,51 +7,29 @@ $totalSeries = array();
 $last = array();
 $lastTotal = 0.0;
 
-$charts = array();
+require_once(__DIR__.DIRECTORY_SEPARATOR.'coins.config.php');
 
-/*
-$charts[] = array(
-    'name'=>'last 30min',
-    'minInterval'=>5,
-    'minTimestamp'=>time()-1800
-);
+$maxActualValues = 0;
+$actualValues = array();
+foreach ($infos as $timestamp => $values) {
+  $isFull = true;
+  $total = 0.0;
+  $actualValues = array();
+  foreach ($values as $device => $info) {
+    if($info["valueOfMyCoins"]) {
+      $total += $info["valueOfMyCoins"];
+      $actualValues[$device] = $info["valueOfMyCoins"];
+      $maxActualValues = max($maxActualValues, $info["valueOfMyCoins"]);
+    }
+  }
+}
+arsort($actualValues);
 
-$charts[] = array(
-    'name'=>'last 1H',
-    'minInterval'=>5,
-    'minTimestamp'=>time()-3600*1
-);
-*/
-$charts[] = array(
-    'name'=>'last 6H',
-    'minInterval'=>10,
-    'minTimestamp'=>time()-3600*6
-);
 
-$charts[] = array(
-    'name'=>'last 24H',
-    'minInterval'=>60,
-    'minTimestamp'=>time()-3600*24
-);
+$widthRatio = 10/$maxActualValues;
 
-$charts[] = array(
-    'name'=>'last week',
-    'minInterval'=>60*60,
-    'minTimestamp'=>time()-3600*24*7
-);
 
-$charts[] = array(
-    'name'=>'last month',
-    'minInterval'=>60*60*2,
-    'minTimestamp'=>time()-3600*24*30
-);
-
-$charts[] = array(
-    'name'=>'all',
-    'minInterval'=>60*60*2,
-    'minTimestamp'=>time()-3600*24*365*12
-);
-
+$lastTimestamp = null;
 foreach($charts as $chartIndex=>$chartDef) {
   $devices = array();
   $minTimestamp = $chartDef['minTimestamp'];
@@ -60,11 +38,17 @@ foreach($charts as $chartIndex=>$chartDef) {
   $lastTimestamp = null;
   $firstValue = null;
 
+
+  $isLastEntry = false;
+  $counter = 0;
   foreach ($infos as $timestamp => $values) {
+    $counter++;
     $isFull = true;
     $total = 0.0;
 
-    if($timestamp < $minTimestamp)
+    $isLastEntry = $counter == count($infos);
+
+    if($timestamp < $minTimestamp && ! $isLastEntry)
     {
       continue;
     }
@@ -78,20 +62,36 @@ foreach($charts as $chartIndex=>$chartDef) {
       if (!array_key_exists($device, $devices)) {
         $devices[$device] = array();
       }
-      if (false && $info["valueInEuro"] == 0) {
-        $isFull = false;
-        continue;
-      }
       $devices[$device][$timestamp] = $info["valueInEuro"];
     }
   }
 
+  //set order
   $newDevices = array();
+  foreach($actualValues as $device=>$total)
+  {
+    if($total < 5)
+    {
+      continue;
+    }
+    $newDevices[$device] = array();
+  }
+
   foreach($devices as $device=>$values) {
     $newDevices[$device] = array();
+    $newDevices[$device]['values'] = array();
+
+
 
     $isFirst = true;
     $refValue = null;
+
+    if($actualValues[$device] < 5)
+    {
+      continue;
+    }
+    $newDevices[$device]['total'] = $actualValues[$device];
+    $newDevices[$device]['widthRatio'] = max(1, round($widthRatio * $actualValues[$device]));
 
     foreach ($values as $timestamp => $value) {
       if ($isFirst) {
@@ -99,16 +99,21 @@ foreach($charts as $chartIndex=>$chartDef) {
         //$value = 100;
         $isFirst = false;
       }
-      $newValue = (100 * $value) / $refValue;
-      $newDevices[$device][$timestamp] = $newValue;
+      //$newValue = 100 - ((100 * $value) / $refValue);
+      $newValue = 100 * ($value - $refValue) / $refValue;
+      $newDevices[$device]['values'][$timestamp] = $newValue;
     }
   }
 
   $charts[$chartIndex]['devices'] = $newDevices;
 }
-
+$lastTimestamp = end(array_keys($infos))+3600;
+/*foreach ($infos as $timestamp => $values) {
+  $lastTimestamp = $timestamp;
+}*/
 ?><html>
 <head>
+  <meta http-equiv="refresh" content="300">
   <title>Coin control center</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -116,11 +121,15 @@ foreach($charts as $chartIndex=>$chartDef) {
   <!-- Optional theme -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
+
   <!-- Latest compiled and minified JavaScript -->
   <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="./Chart.js"></script>
+  <script src="./md5.min.js"></script>
+  <script src="./coins.js"></script>
   <script src="https://npmcdn.com/Chart.Zoom.js@latest/Chart.Zoom.min.js"></script>
+
 
 </head>
 <body>
@@ -129,11 +138,13 @@ foreach($charts as $chartIndex=>$chartDef) {
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
+      <h1><?php echo date('H:i', $lastTimestamp); ?></h1>
       <br />
       <?php foreach($charts as $chartIndex=>$chartInfo): ?>
         <?php
         $devices = $chartInfo['devices'];
         $name = $chartInfo['name'];
+
 
         ?>
         <div class="row">
@@ -145,24 +156,25 @@ foreach($charts as $chartIndex=>$chartDef) {
           <div class="col-md-2">&nbsp;</div>
         </div>
         <script>
-        function getRandomColor() {
-          var letters = '0123456789ABCDEF';
-          var color = '#';
-          for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
-        }
 
-  dataSet = [];
+  var dataSet<?php echo $chartIndex; ?> = [];
+  var dataSet<?php echo $chartIndex; ?>Total = [];
   <?php $first = true; ?>
-  <?php foreach($devices as $deviceName=>$values): ?>
-  color = getRandomColor();
+  <?php foreach($devices as $deviceName=>$_info): ?>
+    <?php
+            $values = $_info['values'];
+            $total = $_info['total'];
+            $widthRatio = $_info['widthRatio'];
+
+    ?>
+     <?php if(empty($values)){continue;}?>
+  color = getRandomColor("<?php echo $deviceName; ?>");
   theSet = {
-              label: '<?php echo $deviceName; ?>',
+              label: '<?php echo $deviceName; ?> : <?php echo round($total); ?>€',
               showLine: true,
               backgroundColor: color,
               borderColor: color,
+              borderWidth: <?php echo $widthRatio; ?>,
               fill: false,
               data: <?php
           $toDisplay = array();
@@ -172,25 +184,26 @@ foreach($charts as $chartIndex=>$chartDef) {
 
           echo json_encode($toDisplay);
           ?>,
-              borderWidth: 1
           };
-          dataSet.push(theSet);
+          dataSet<?php echo $chartIndex; ?>.push(theSet);
+          dataSet<?php echo $chartIndex; ?>Total.push(<?php echo $total; ?>);
 
   <?php endforeach; ?>
   ctx = document.getElementById("myChart<?php echo $chartIndex; ?>").getContext('2d');
   myChart = new Chart(ctx, {
       type: 'scatter',
       data: {
-          datasets: dataSet
+          datasets: dataSet<?php echo $chartIndex; ?>
       },
       options: {
           tooltips: {
               callbacks: {
                   label: function(tooltipItem, data) {
-                      var currencyLabel = dataSet[tooltipItem.datasetIndex].label;
+                      var currencyLabel = dataSet<?php echo $chartIndex; ?>[tooltipItem.datasetIndex].label;
+                      var currencyTotal = dataSet<?php echo $chartIndex; ?>Total[tooltipItem.datasetIndex];
                       var dt = new Date(tooltipItem.xLabel * 1000);
-                      var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)+'/'+dt.getFullYear()+' '+dt.getHours()+':'+dt.getMinutes() ;
-                      return currencyLabel + ' : ' + tooltipItem.yLabel+' % on '+dateString;
+                      var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)/*+'/'+dt.getFullYear()*/+' '+dt.getHours()+':'+dt.getMinutes() ;
+                      return currencyLabel + ' : ' + Math.round(tooltipItem.yLabel)+'% on '+dateString+' : '+Math.round(currencyTotal);
                   }
               }
           },

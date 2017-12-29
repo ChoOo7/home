@@ -6,51 +6,9 @@ $devices = array('TOTAL'=>array());
 $totalSeries = array();
 $last = array();
 $lastTotal = 0.0;
+$lastTimestamp = null;
 
-$charts = array();
-
-/*
-$charts[] = array(
-    'name'=>'last 30min',
-    'minInterval'=>5,
-    'minTimestamp'=>time()-1800
-);
-
-$charts[] = array(
-    'name'=>'last 1H',
-    'minInterval'=>5,
-    'minTimestamp'=>time()-3600*1
-);
-*/
-$charts[] = array(
-    'name'=>'last 6H',
-    'minInterval'=>10,
-    'minTimestamp'=>time()-3600*6
-);
-
-$charts[] = array(
-    'name'=>'last 24H',
-    'minInterval'=>60,
-    'minTimestamp'=>time()-3600*24
-);
-
-$charts[] = array(
-    'name'=>'last week',
-    'minInterval'=>60*60,
-    'minTimestamp'=>time()-3600*24*7
-);
-
-$charts[] = array(
-    'name'=>'last month',
-    'minInterval'=>60*60*2,
-    'minTimestamp'=>time()-3600*24*30
-);
-
-$charts[] = array(
-    'name'=>'all',
-    'minInterval'=>60*60*2,
-    'minTimestamp'=>time()-3600*24*365*12
-);
+require_once(__DIR__.DIRECTORY_SEPARATOR.'coins.config.php');
 
 foreach($charts as $chartIndex=>$chartDef) {
   $devices = array('TOTAL'=>array());
@@ -61,11 +19,20 @@ foreach($charts as $chartIndex=>$chartDef) {
   $firstTotal = null;
   $lastTotal = null;
 
+  $isLastEntry = false;
+  $counter = 0;
+
+  $sumForAvg = 0.0;
+  $nbForAvg = 0;
+
   foreach ($infos as $timestamp => $values) {
+    $counter++;
     $isFull = true;
     $total = 0.0;
 
-    if($timestamp < $minTimestamp)
+    $isLastEntry = $counter == count($infos);
+
+    if($timestamp < $minTimestamp && ! $isLastEntry)
     {
       continue;
     }
@@ -83,7 +50,9 @@ foreach($charts as $chartIndex=>$chartDef) {
         $isFull = false;
         continue;
       }
-      $devices[$device][$timestamp] = $info["valueOfMyCoins"];
+      if($info["valueOfMyCoins"] >= 5) {
+        $devices[$device][$timestamp] = $info["valueOfMyCoins"];
+      }
       $total += $info["valueOfMyCoins"];
     }
     if ($isFull) {
@@ -96,9 +65,25 @@ foreach($charts as $chartIndex=>$chartDef) {
       $lastTotal = $total;
     }
   }
-  $variation = ($lastTotal - $firstTotal) / $firstTotal;
+
+
+  $normalDelta = 0;
+  foreach($refundsAndWithdrawal as $actionTimestamp => $theLocalVariation)
+  {
+    if($actionTimestamp >= $minTimestamp)
+    {
+      $normalDelta += $theLocalVariation;
+    }
+  }
+
+  $variation = ($lastTotal - $firstTotal);
+  $normalVariation = ($variation - $normalDelta);
+  $variationPct = ($normalVariation) / $firstTotal;
   $charts[$chartIndex]['devices'] = $devices;
   $charts[$chartIndex]['variation'] = $variation;
+  $charts[$chartIndex]['normalVariation'] = $normalVariation;
+  $charts[$chartIndex]['variationPct'] = $variationPct;
+
 }
 
 $actualValues = array();
@@ -115,9 +100,12 @@ foreach ($infos as $timestamp => $values) {
   }
 }
 
+$lastTimestamp = end(array_keys($infos))+3600;
+
 arsort($actualValues, SORT_NUMERIC);
 ?><html>
 <head>
+  <meta http-equiv="refresh" content="300">
   <title>Coin control center - <?php echo $total; ?>€</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -129,6 +117,8 @@ arsort($actualValues, SORT_NUMERIC);
   <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="./Chart.js"></script>
+  <script src="./md5.min.js"></script>
+  <script src="./coins.js"></script>
   <script src="https://npmcdn.com/Chart.Zoom.js@latest/Chart.Zoom.min.js"></script>
 
 </head>
@@ -138,7 +128,7 @@ arsort($actualValues, SORT_NUMERIC);
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-12">
-      <h1>Total : <?php echo round($total, 2); ?>€</h1>
+      <h1>Total : <?php echo round($total, 2); ?>€ on <?php echo date('H:i', $lastTimestamp); ?></h1>
       <?php foreach($actualValues as $crypto=>$value): ?>
         <?php if($value >= 3): ?>
           <?php
@@ -153,10 +143,13 @@ arsort($actualValues, SORT_NUMERIC);
         $devices = $chartInfo['devices'];
         $name = $chartInfo['name'];
         $variation = $chartInfo['variation'];
+        $normalVariation = $chartInfo['normalVariation'];
+        $variationPct = $chartInfo['variationPct'];
+
 
         ?>
         <div class="row">
-          <h2><?php echo $name; ?> | <?php echo round($variation*100, 2); ?>%</h2>
+          <h2><?php echo $name; ?> | <?php echo round($variationPct*100, 2); ?>% | <?php echo round($normalVariation, 2); ?>€<?php if($normalVariation != $variation): ?> | <?php echo round($variation, 2); ?>€<?php endif; ?> </h2>
           <div class="col-md-2">&nbsp;</div>
           <div class="col-md-8">
             <canvas id="myChart<?php echo $chartIndex; ?>" style="width: 80%;height: 400px;"></canvas>
@@ -164,22 +157,17 @@ arsort($actualValues, SORT_NUMERIC);
           <div class="col-md-2">&nbsp;</div>
         </div>
         <script>
-        function getRandomColor() {
-          var letters = '0123456789ABCDEF';
-          var color = '#';
-          for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
-        }
 
-  dataSet = [];
+
+  var dataSet<?php echo $chartIndex; ?> = [];
   <?php $first = true; ?>
   <?php foreach($devices as $deviceName=>$values): ?>
-  color = getRandomColor();
+            <?php if(empty($values)){continue;}?>
+  color = getRandomColor("<?php echo $deviceName; ?>");
   theSet = {
               label: '<?php echo $deviceName; ?>',
               showLine: true,
+              <?php echo $deviceName == 'TOTAL' ? 'hidden: true,' : ''; ?>
               backgroundColor: color,
               borderColor: color,
               fill: false,
@@ -193,22 +181,22 @@ arsort($actualValues, SORT_NUMERIC);
           ?>,
               borderWidth: 1
           };
-          dataSet.push(theSet);
+          dataSet<?php echo $chartIndex; ?>.push(theSet);
 
   <?php endforeach; ?>
   ctx = document.getElementById("myChart<?php echo $chartIndex; ?>").getContext('2d');
   myChart = new Chart(ctx, {
       type: 'scatter',
       data: {
-          datasets: dataSet
+          datasets: dataSet<?php echo $chartIndex; ?>
       },
       options: {
           tooltips: {
               callbacks: {
                   label: function(tooltipItem, data) {
-                      var currencyLabel = dataSet[tooltipItem.datasetIndex].label;
+                      var currencyLabel = dataSet<?php echo $chartIndex; ?>[tooltipItem.datasetIndex].label;
                       var dt = new Date(tooltipItem.xLabel * 1000);
-                      var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)+'/'+dt.getFullYear()+' '+dt.getHours()+':'+dt.getMinutes() ;
+                      var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)/*+'/'+dt.getFullYear()*/+' '+dt.getHours()+':'+dt.getMinutes() ;
                       return currencyLabel + ' : ' + Math.round(tooltipItem.yLabel)+' € on '+dateString;
                   }
               }
@@ -229,7 +217,7 @@ arsort($actualValues, SORT_NUMERIC);
                       beginAtZero:false,
                       callback: function(value, index, values) {
                           var dt = new Date(value * 1000);
-                          var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)+'/'+dt.getFullYear()+' '+dt.getHours()+':'+dt.getMinutes() ;
+                          var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)/*+'/'+dt.getFullYear()*/+' '+dt.getHours()+':'+dt.getMinutes() ;
                           return dateString;
                       }
 

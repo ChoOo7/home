@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__.'/coinmon.class.php');
-
+die('deactivated');
 
 $coins = array(
     'CDT'=>49.80000000,

@@ -10,8 +10,35 @@ $lastTimestamp = null;
 
 require_once(__DIR__.DIRECTORY_SEPARATOR.'coins.config.php');
 
+
+
+$actualValues = array();
+
+foreach ($infos as $timestamp => $values) {
+  $isFull = true;
+  $total = 0.0;
+  $actualValues = array();
+  foreach ($values as $device => $info) {
+    if($info["valueOfMyCoins"]) {
+      $total += $info["valueOfMyCoins"];
+      $actualValues[$device] = $info["valueOfMyCoins"];
+    }
+  }
+}
+
+$lastTimestamp = end(array_keys($infos))+3600;
+
+arsort($actualValues, SORT_NUMERIC);
+
+
 foreach($charts as $chartIndex=>$chartDef) {
   $devices = array('TOTAL'=>array());
+
+  foreach($actualValues as $device=>$uselessTotal)
+  {
+    $devices[$device] = array();
+  }
+
   $minTimestamp = $chartDef['minTimestamp'];
   $minInterval = $chartDef['minInterval'];
 
@@ -64,7 +91,9 @@ foreach($charts as $chartIndex=>$chartDef) {
       }
       $lastTotal = $total;
     }
+
   }
+  $devices = array_filter($devices);
 
 
   $normalDelta = 0;
@@ -105,7 +134,7 @@ $lastTimestamp = end(array_keys($infos))+3600;
 arsort($actualValues, SORT_NUMERIC);
 ?><html>
 <head>
-  <meta http-equiv="refresh" content="300">
+  <meta http-equiv="refresh" content="100">
   <title>Coin control center - <?php echo $total; ?>€</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">

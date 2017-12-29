@@ -113,7 +113,7 @@ $lastTimestamp = end(array_keys($infos))+3600;
 }*/
 ?><html>
 <head>
-  <meta http-equiv="refresh" content="300">
+  <meta http-equiv="refresh" content="200">
   <title>Coin control center</title>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">

@@ -65,7 +65,7 @@ if(array_key_exists("binance", $config) && $config["binance"]["key"]) {
   foreach($balances as $name=>$info)
   {
 
-    $av = $info['available'];
+    $av = $info['available'] + $info['onOrder'];
     if($av == 0.0)
     {
       continue;

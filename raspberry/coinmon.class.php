@@ -56,6 +56,7 @@ class Coinmon
     $lastMonth = $now - 3600*24*30;
     $lastYear = $now - 3600*24*30;
 
+    ksort($cnt, SORT_NUMERIC);
     $lastTime = null;
     foreach($cnt as $time=>$values)
     {
@@ -64,24 +65,25 @@ class Coinmon
       {
         $shouldKeep = true;
       }
-      $delta = $time - $lastTime;
-      if($time < $lastYear)//il y a plus d'un an
-      {
-        $shouldKeep = $delta <= $oneDay;
-      }elseif($time < $lastMonth)//entre un mois et un an
-      {
-        $shouldKeep = $delta <= ($oneHour*12);
-      }elseif($time < $lastWeek)//entre une semaine et un mois
-      {
-        $shouldKeep = $delta <= ($oneHour * 6);
-      }elseif($time < $last3days)
-      {
-        $shouldKeep = $delta <= ($oneHour);
-      }elseif($time < $lastDay)//entre 1 et 3 jours
-      {
-        $shouldKeep = $delta <= (60*30);//30 minutes
-      }else{
-        $shouldKeep = true;//today : on garde tout
+      if( ! $shouldKeep) {
+        $delta = $time - $lastTime;
+        if ($time < $lastYear)//il y a plus d'un an
+        {
+          $shouldKeep = $delta >= $oneDay;
+        } elseif ($time < $lastMonth)//entre un mois et un an
+        {
+          $shouldKeep = $delta >= ($oneHour * 12);
+        } elseif ($time < $lastWeek)//entre une semaine et un mois
+        {
+          $shouldKeep = $delta >= ($oneHour * 6);
+        } elseif ($time < $last3days) {
+          $shouldKeep = $delta >= ($oneHour);
+        } elseif ($time < $lastDay)//entre 1 et 3 jours
+        {
+          $shouldKeep = $delta >= (60 * 30);//30 minutes
+        } else {
+          $shouldKeep = true;//today : on garde tout
+        }
       }
       if( ! $shouldKeep)
       {

@@ -11,6 +11,20 @@ $lastTimestamp = null;
 require_once(__DIR__.DIRECTORY_SEPARATOR.'coins.config.php');
 
 
+$charts = array();
+
+$charts[] = array(
+    'name'=>'last 6H',
+    'minInterval'=>600,
+    'minTimestamp'=>time()-3600*6
+);
+
+$charts[] = array(
+    'name'=>'last 24H',
+    'minInterval'=>60*30,
+    'minTimestamp'=>time()-3600*24
+);
+
 
 $actualValues = array();
 
@@ -165,7 +179,7 @@ foreach($charts as $chartIndex=>$chartDef) {
   $newDevices = array();
   foreach($actualValues as $device=>$total)
   {
-    if($total < 30)
+    if($total < 5)
     {
       continue;
     }
@@ -181,7 +195,7 @@ foreach($charts as $chartIndex=>$chartDef) {
     $isFirst = true;
     $refValue = null;
 
-    if( ! array_key_exists($device, $actualValues) || $actualValues[$device] < 30)
+    if( ! array_key_exists($device, $actualValues) || $actualValues[$device] < 5)
     {
       continue;
     }

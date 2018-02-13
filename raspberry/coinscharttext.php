@@ -11,7 +11,6 @@ $lastTimestamp = null;
 require_once(__DIR__.DIRECTORY_SEPARATOR.'coins.config.php');
 
 
-
 $actualValues = array();
 
 $maxActualValues = 0;
@@ -165,7 +164,7 @@ foreach($charts as $chartIndex=>$chartDef) {
   $newDevices = array();
   foreach($actualValues as $device=>$total)
   {
-    if($total < 30)
+    if($total < 5)
     {
       continue;
     }
@@ -181,7 +180,7 @@ foreach($charts as $chartIndex=>$chartDef) {
     $isFirst = true;
     $refValue = null;
 
-    if( ! array_key_exists($device, $actualValues) || $actualValues[$device] < 30)
+    if( ! array_key_exists($device, $actualValues) || $actualValues[$device] < 5)
     {
       continue;
     }
@@ -277,198 +276,24 @@ arsort($actualValues, SORT_NUMERIC);
           <h2><?php echo $name; ?> | <?php echo round($variationPct*100, 2); ?>% | <?php echo round($normalVariation, 2); ?>€<?php if($normalVariation != $variation): ?> | <?php echo round($variation, 2); ?>€<?php endif; ?> </h2>
           <div class="col-md-1">&nbsp;</div>
           <div class="col-md-5">
-            <canvas id="myChart<?php echo $chartIndex; ?>" style="width: 80%;height: 400px;"></canvas>
+            <?php foreach($devices as $deviceName=>$values): ?>
+            <?php if(empty($values)){continue;}?>
+            <?php
+            $last = end($values);
+
+            $valuesVar = $devicesVariation[$deviceName]['values'];
+            $lastVar = end($valuesVar);
+            echo "<p>".$deviceName.' : '.round($last).' ( '.round($lastVar). ' %) </p>';
+            ?>
+            <?php endforeach; ?>
           </div>
           <div class="col-md-5">
-            <canvas id="myChartVar<?php echo $chartIndex; ?>" style="width: 80%;height: 400px;"></canvas>
+
           </div>
           <div class="col-md-1">&nbsp;</div>
         </div>
-        <script>
+      <?php endforeach; ?>
 
-
-  var dataSet<?php echo $chartIndex; ?> = [];
-  var dataSetVar<?php echo $chartIndex; ?> = [];
-  var dataSetVar<?php echo $chartIndex; ?>Total = [];
-  <?php $first = true; ?>
-  <?php foreach($devices as $deviceName=>$values): ?>
-            <?php if(empty($values)){continue;}?>
-  color = getRandomColor("<?php echo $deviceName; ?>");
-  theSet = {
-              label: '<?php echo $deviceName; ?>',
-              showLine: true,
-              <?php echo $deviceName == 'TOTAL' ? 'hidden: true,' : ''; ?>
-              backgroundColor: color,
-              borderColor: color,
-              fill: false,
-              data: <?php
-            $toDisplay = array();
-            foreach($values as $timestamp=>$value){
-              $toDisplay[] = array('x'=>$timestamp, 'y'=>$value);
-            }
-
-            echo json_encode($toDisplay);
-            ?>,
-              borderWidth: 1
-          };
-          dataSet<?php echo $chartIndex; ?>.push(theSet);
-
-
-  ctx<?php echo $chartIndex; ?> = document.getElementById("myChart<?php echo $chartIndex; ?>").getContext('2d');
-  new Chart(ctx<?php echo $chartIndex; ?>, {
-      type: 'scatter',
-      data: {
-          datasets: dataSet<?php echo $chartIndex; ?>
-      },
-      options: {
-          animation: {
-            duration: 0,
-          },
-          tooltips: {
-              callbacks: {
-                  label: function(tooltipItem, data) {
-                      var currencyLabel = dataSet<?php echo $chartIndex; ?>[tooltipItem.datasetIndex].label;
-                      var dt = new Date(tooltipItem.xLabel * 1000);
-                      var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)/*+'/'+dt.getFullYear()*/+' '+dt.getHours()+':'+dt.getMinutes() ;
-                      return currencyLabel + ' : ' + Math.round(tooltipItem.yLabel)+' € on '+dateString;
-                  }
-              }
-          },
-          scales: {
-              yAxes: [{
-                  ticks: {
-                      beginAtZero:false,
-                      callback: function(value, index, values) {
-                          return Math.round(value)+' €';
-                      }
-
-                  }
-              }],
-
-              xAxes: [{
-                  ticks: {
-                      beginAtZero:false,
-                      callback: function(value, index, values) {
-                          var dt = new Date(value * 1000);
-                          var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)/*+'/'+dt.getFullYear()*/+' '+dt.getHours()+':'+dt.getMinutes() ;
-                          return dateString;
-                      }
-
-                  }
-              }],
-
-          },
-          pan: {
-              enabled: true,
-              mode: 'xy'
-          },
-          zoom: {
-              enabled: true,
-              mode: 'xy',
-              limits: {
-                  max: 10,
-                  min: 0.5
-              }
-          }
-      }
-  });
-
-  <?php endforeach; ?>
-
-  <?php $first = true; ?>
-  <?php foreach($devicesVariation as $deviceName=>$_info): ?>
-    <?php
-    $values = $_info['values'];
-    $total = @$_info['total'];
-    $widthRatio = @$_info['widthRatio'];
-
-    ?>
-    <?php if(empty($values)){continue;}?>
-
-  color = getRandomColor("<?php echo $deviceName; ?>");
-  theSetVar<?php echo $chartIndex; ?> = {
-              label: '<?php echo $deviceName; ?> : <?php echo round($total); ?>€',
-              showLine: true,
-              showLine: true,
-              <?php echo stripos($deviceName, 'TOTAL') !== false ? 'hidden: true,' : ''; ?>
-              backgroundColor: color,
-              borderColor: color,
-              borderWidth: <?php echo $widthRatio; ?>,
-              fill: false,
-              data: <?php
-          $toDisplay = array();
-          foreach($values as $timestamp=>$value){
-            $toDisplay[] = array('x'=>$timestamp, 'y'=>$value);
-          }
-
-          echo json_encode($toDisplay);
-          ?>,
-          };
-          dataSetVar<?php echo $chartIndex; ?>.push(theSetVar<?php echo $chartIndex; ?>);
-          dataSetVar<?php echo $chartIndex; ?>Total.push(<?php echo $total; ?>);
-
-  <?php endforeach; ?>
-  ctxVar<?php echo $chartIndex; ?> = document.getElementById("myChartVar<?php echo $chartIndex; ?>").getContext('2d');
-  new Chart(ctxVar<?php echo $chartIndex; ?>, {
-      type: 'scatter',
-      data: {
-          datasets: dataSetVar<?php echo $chartIndex; ?>
-      },
-      options: {
-          animation: {
-            duration: 0,
-          },
-          tooltips: {
-              callbacks: {
-                  label: function(tooltipItem, data) {
-                      var currencyLabel = dataSetVar<?php echo $chartIndex; ?>[tooltipItem.datasetIndex].label;
-                      var currencyTotal = dataSetVar<?php echo $chartIndex; ?>Total[tooltipItem.datasetIndex];
-                      var dt = new Date(tooltipItem.xLabel * 1000);
-                      var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)/*+'/'+dt.getFullYear()*/+' '+dt.getHours()+':'+dt.getMinutes() ;
-                      return currencyLabel + ' : ' + Math.round(tooltipItem.yLabel)+'% on '+dateString+' : '+Math.round(currencyTotal);
-                  }
-              }
-          },
-          scales: {
-              yAxes: [{
-                  ticks: {
-                      beginAtZero:false,
-                      callback: function(value, index, values) {
-                          return value+' %';
-                      }
-
-                  }
-              }],
-
-              xAxes: [{
-                  ticks: {
-                      beginAtZero:false,
-                      callback: function(value, index, values) {
-                          var dt = new Date(value * 1000);
-                          var dateString = dt.getDate()+ "/" + (dt.getMonth() + 1)+'/'+dt.getFullYear()+' '+dt.getHours()+':'+dt.getMinutes() ;
-                          return dateString;
-                      }
-
-                  }
-              }],
-
-          },
-          pan: {
-              enabled: true,
-              mode: 'xy'
-          },
-          zoom: {
-              enabled: true,
-              mode: 'xy',
-              limits: {
-                  max: 10,
-                  min: 0.5
-              }
-          }
-      }
-  });
-  </script>
-<?php endforeach; ?>
 
     </div>
   </div>

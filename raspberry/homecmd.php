@@ -247,6 +247,76 @@ switch($cmd)
     break;
 
 
+  case "sam":
+  case "samlepompier":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(825);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+  case "tchoupi":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(826);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+  case "peppa":
+  case "peppapig":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(824);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+  case "poule":
+  case "pouleRousse":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(823);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+  
+  case "castor":
+  case "pereCastor":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(827);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+
   case "croc":
   case "crocodile":
     $d->powerOnAndWaitForRead();

@@ -55,6 +55,26 @@ $anthoSambaContent = glob('/servers/antho/home/simon/samba/*');
 
 $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /media/data/downloaded';
 
+
+
+require_once(__DIR__.'/coinmon.class.php');
+$cm = new Coinmon();
+$infos = $cm->getCalculatedValues();
+
+$total = 0;
+$maxActualValues = 0;
+foreach ($infos as $timestamp => $values) {
+  $isFull = true;
+  $total = 0.0;
+  $actualValues = array();
+  foreach ($values as $device => $info) {
+    if($info["valueOfMyCoins"]) {
+      $total += $info["valueOfMyCoins"];
+      $actualValues[$device] = $info["valueOfMyCoins"];
+      $maxActualValues = max($maxActualValues, $info["valueOfMyCoins"]);
+    }
+  }
+}
 /*
  http://www.audioproducts.com.au/downloadcenter/products/Denon/CEOLPICCOLOBK/Manuals/DRAN5_RCDN8_PROTOCOL_V.1.0.0.pdf
  */
@@ -93,7 +113,7 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <h1 class="alert error">ChoOo7 n'est pas montée</h1>
             <hr />
           <?php endif; ?>
-          
+          <h1><?php echo round($total); ?></h1>
           <h2>Ampli : <?php echo $denonState; ?></h2>
 
           <div class="btn-group">
@@ -192,8 +212,26 @@ $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recurs
             <button class="btn btn-default doAction" type="button" data-do="ouioui">
               <em class="glyphicon"></em> Oui oui
             </button>
+            <button class="btn btn-default doAction" type="button" data-do="castor">
+              <em class="glyphicon"></em> Pere castor
+            </button>
             <button class="btn btn-default doAction" type="button" data-do="trotro">
               <em class="glyphicon"></em> TroTro
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="tchoupi">
+              <em class="glyphicon"></em> Tchoupi
+            </button>
+
+            <button class="btn btn-default doAction" type="button" data-do="sam">
+              <em class="glyphicon"></em> Sam le pompier
+            </button>
+
+            <button class="btn btn-default doAction" type="button" data-do="peppa">
+              <em class="glyphicon"></em> Peppa Pig
+            </button>
+
+            <button class="btn btn-default doAction" type="button" data-do="poule">
+              <em class="glyphicon"></em> poule
             </button>
           </div>
 

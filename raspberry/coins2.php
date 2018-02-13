@@ -15,7 +15,8 @@ $coinsPrice = array();
 $coinsPriceEur = array();
 
 $config = json_decode(file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'coins.config'), true);
-if(array_key_exists("kraken", $config) && $config["kraken"]["key"]) {
+
+if(false && array_key_exists("kraken", $config) && $config["kraken"]["key"]) {
   $key = $config["kraken"]["key"];
   $secret = $config["kraken"]["secret"];
   // set which platform to use (currently only beta is operational, live available soon)
@@ -29,24 +30,24 @@ if(array_key_exists("kraken", $config) && $config["kraken"]["key"]) {
   $tryLeft = 10;
   do {
     $tryLeft--;
-    $res = $kraken->QueryPrivate('Balance');
-    if(array_key_exists("result", $res) &&  ! empty($res['result']))
-    {
-      $isOk = true;
-      foreach($res['result'] as $name=>$value)
-      {
-        $name = preg_replace('!^X([a-zA-Z0-9]+)$!', '$1', $name);
-        //$newName = str_replace('XX', 'X', $name);
-        if($name == "XBT") {
-          $name = "BTC";
+    try {
+      $res = $kraken->QueryPrivate('Balance');
+      if (array_key_exists("result", $res) && !empty($res['result'])) {
+        $isOk = true;
+        foreach ($res['result'] as $name => $value) {
+          $name = preg_replace('!^X([a-zA-Z0-9]+)$!', '$1', $name);
+          //$newName = str_replace('XX', 'X', $name);
+          if ($name == "XBT") {
+            $name = "BTC";
+          }
+          if (!array_key_exists($name, $coins)) {
+            $coins[$name] = 0.0;
+          }
+          $coins[$name] += $value;
         }
-        if( ! array_key_exists($name, $coins))
-        {
-          $coins[$name] = 0.0;
-        }
-        $coins[$name] += $value;
       }
     }
+    catch(Exception $e){sleep(1);}
   } while($tryLeft > 0 && ! $isOk);
   if( ! $isOk)
   {

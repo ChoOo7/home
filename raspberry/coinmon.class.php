@@ -36,6 +36,11 @@ class Coinmon
     $fileName = __DIR__.DIRECTORY_SEPARATOR.'coinsInfo.json';
     $cnt = $this->getCalculatedValues();
     $cnt[time()]=$values;
+    if(count($cnt) < 5)
+    {
+      echo('not enought data, strange !!!');
+      throw new Exception('not enought data, strange !!!');
+    }
     file_put_contents($fileName, json_encode($cnt, JSON_PRETTY_PRINT));
   }
 

@@ -7,7 +7,7 @@ class Kodi
 
   public function getIp()
   {
-    return "192.168.0.121:8080";
+    return "192.168.0.201:8080";
   }
 
   protected function sendCommand($url, $cmd = null, $async = true)

@@ -2,6 +2,7 @@
 
 require_once(__DIR__.'/denon.class.php');
 require_once(__DIR__.'/kodi.class.php');
+require_once(__DIR__.'/smartphone.class.php');
 
 $d = new MyDenon();
 $k = new Kodi();
@@ -32,12 +33,36 @@ switch($cmd)
     $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
     passthru($command);
     break;
-  
+
+
+  case "tooglefranceintercreatived80":
+    $command = 'ps aux | grep vlc | grep -v grep';
+    $output = array();
+    exec($command, $output);
+    var_dump($output);
+    if(count($output) == 0)
+    {
+      echo "\nStarting\n";
+      $command = 'cvlc --http-password test:test --http-host=0.0.0.0 -A alsa,none --alsa-audio-device default  -I http --http-port 43822 "http://direct.franceinter.fr/live/franceinter-midfi.mp3"';
+      $outputFile = "./vlcOutput.log";
+      $command = "nohup ".$command ." > ".$outputFile." 2>&1 &";
+    }else{
+      echo "\nKilling\n";
+      $command = 'killall vlc';
+    }
+    passthru($command);
+    break;
+
+
+
+
+
   case "+":
   case "up":
   case "volumeUp":
     $d->volumeUp();
     break;
+
   case "++":
     $d->volumeUp();
     $d->volumeUp();
@@ -541,6 +566,40 @@ switch($cmd)
   case "scan":
     $k->scan();
     break;
+
+
+
+
+
+  case "ventiloGet":
+  case "fanGet":
+    $s = new Smartphone();
+    $state = $s->getFanState();
+    echo $state ? "On" : "Off";
+    break;
+
+  case "ventiloOn":
+  case "ventilo":
+  case "fanOn":
+  case "fan":
+    $s = new Smartphone();
+    $s->setFanState(true);
+    break;
+
+  case "ventiloOff":
+  case "fanOff":
+    $s = new Smartphone();
+    $s->setFanState(false);
+    break;
+
+  case "ventiloSwitch":
+  case "ventiloToogle":
+  case "fanOff":
+  case "fanToogle":
+    $s = new Smartphone();
+    $s->toogleFanState();
+    break;
+
 
 }
 

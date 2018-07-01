@@ -3,6 +3,7 @@
 require_once(__DIR__.'/denon.class.php');
 require_once(__DIR__.'/kodi.class.php');
 require_once(__DIR__.'/smartphone.class.php');
+require_once(__DIR__.'/raspberry.class.php');
 
 $d = new MyDenon();
 $k = new Kodi();
@@ -36,21 +37,29 @@ switch($cmd)
 
 
   case "tooglefranceintercreatived80":
-    $command = 'ps aux | grep vlc | grep -v grep';
-    $output = array();
-    exec($command, $output);
-    var_dump($output);
-    if(count($output) == 0)
-    {
-      echo "\nStarting\n";
-      $command = 'cvlc --http-password test:test --http-host=0.0.0.0 -A alsa,none --alsa-audio-device default  -I http --http-port 43822 "http://direct.franceinter.fr/live/franceinter-midfi.mp3"';
-      $outputFile = "./vlcOutput.log";
-      $command = "nohup ".$command ." > ".$outputFile." 2>&1 &";
-    }else{
-      echo "\nKilling\n";
-      $command = 'killall vlc';
-    }
-    passthru($command);
+  case "cuisineinter":
+    $url ="http://direct.franceinter.fr/live/franceinter-midfi.mp3";
+    $r = new Raspberry();
+    $r->vlcToogle($url);
+    break;
+
+
+  case "tooglefipcreatived80":
+  case "cuisinefip":
+    $url = "http://direct.fipradio.fr/live/fip-webradio1.mp3";
+    $r = new Raspberry();
+    $r->vlcToogle($url);
+    break;
+
+
+  case "toogleradioperfectord80":
+  case "cuisineradioperfecto":
+  case "cuisineperfecto":
+  case "cuisinerock":
+
+    $url = "http://radioperfecto.net-radio.fr/perfecto.mp3";
+    $r = new Raspberry();
+    $r->vlcToogle($url);
     break;
 
 
@@ -152,6 +161,14 @@ switch($cmd)
     $d->setFavorite("14");
     $k->stop();
     break;
+
+  case "radioperfecto":
+  case "perfecto":
+  case "rock":
+    $d->powerOnAndWaitForRead();
+    $d->setFavorite("6");
+    $k->stop();
+    break;
   
   case "vol":
   case "volume":
@@ -228,13 +245,34 @@ switch($cmd)
     $k->addArtistToPlaylist(822);
     $k->setShuffle();
     $k->playPlaylist();
-  
+
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(822);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    $d->volumeSet(15);
+    break;
+
+  case "henri":
+  case "des":
+  case "henrides":
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(828);
+    $k->setShuffle();
+    $k->playPlaylist();
+
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(828);
     $k->setShuffle();
     $k->playPlaylist();
     $k->setShuffle();
@@ -248,11 +286,11 @@ switch($cmd)
     $d->setDigitIn();
     $d->volumeSet(15);
     $k->clearPlaylist();
-    $k->setShuffle();
+    $k->setShuffle(false);
     $k->addArtistToPlaylist(820);
-    $k->setShuffle();
+    $k->setShuffle(false);
     $k->playPlaylist();
-    $k->setShuffle();
+    $k->setShuffle(false);
     $d->volumeSet(15);
     break;
 

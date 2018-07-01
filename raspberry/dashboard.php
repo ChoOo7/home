@@ -3,8 +3,8 @@ require_once(__DIR__.'/denon.class.php');
 require_once(__DIR__.'/kodi.class.php');
 
 
-$action=$_GET['action'];
-$param=$_GET['param'];
+$action=@$_GET['action'];
+$param=@$_GET['param'];
 
 function ampliSetInputSource()
 {
@@ -130,11 +130,13 @@ foreach ($infos as $timestamp => $values) {
       <div class="row">
         <div class="col-md-12">
           <div class="btn-group">
-            <button class="btn btn-default doAction" type="button" data-do="volumeUp">
-              <em class="glyphicon"></em> Volume +
-            </button>
+
             <button class="btn btn-default doAction" type="button" data-do="volumeDown">
               <em class="glyphicon"></em> Volume -
+            </button>
+
+            <button class="btn btn-default doAction" type="button" data-do="volumeUp">
+              <em class="glyphicon"></em> Volume +
             </button>
           </div>
         </div>
@@ -152,6 +154,13 @@ foreach ($infos as $timestamp => $values) {
             <button class="btn btn-default doAction" type="button" data-do="digit">
               <em class="glyphicon"></em> DIGIT
             </button>
+          </div>
+        </div>
+      </div>
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="inter">
               <em class="glyphicon"></em> France Inter
             </button>
@@ -163,6 +172,9 @@ foreach ($infos as $timestamp => $values) {
             </button>
             <button class="btn btn-default doAction" type="button" data-do="rtu">
               <em class="glyphicon"></em> RTU
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="perfecto">
+              <em class="glyphicon"></em> Perfecto
             </button>
             <button class="btn btn-default doAction" type="button" data-do="chantefrance">
               <em class="glyphicon"></em> CHANTEFRANCE
@@ -205,19 +217,28 @@ foreach ($infos as $timestamp => $values) {
               <em class="glyphicon"></em> Gipsy
             </button>
           </div>
-          <br />
-
-
+        </div>
+      </div>
+      <br />
+      <div class="row">
+        <div class="col-md-12">
           <div class="btn-group">
-            <button class="btn btn-default doAction" type="button" data-do="ouioui">
-              <em class="glyphicon"></em> Oui oui
-            </button>
             <button class="btn btn-default doAction" type="button" data-do="castor">
               <em class="glyphicon"></em> Pere castor
             </button>
+
+            <button class="btn btn-default doAction" type="button" data-do="henrides">
+              <em class="glyphicon"></em> Henri des
+            </button>
+
+            <button class="btn btn-default doAction" type="button" data-do="ouioui">
+              <em class="glyphicon"></em> Oui oui
+            </button>
+
             <button class="btn btn-default doAction" type="button" data-do="trotro">
               <em class="glyphicon"></em> TroTro
             </button>
+
             <button class="btn btn-default doAction" type="button" data-do="tchoupi">
               <em class="glyphicon"></em> Tchoupi
             </button>
@@ -233,18 +254,68 @@ foreach ($infos as $timestamp => $values) {
             <button class="btn btn-default doAction" type="button" data-do="poule">
               <em class="glyphicon"></em> poule
             </button>
+
           </div>
+        </div>
+      </div>
 
-          <br />
 
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Cuisine</h2>
           <div class="btn-group">
-            <button class="btn btn-default doAction" type="button" data-do="clean">
-              <em class="glyphicon"></em> Clean
+            <button class="btn btn-default doAction" type="button" data-do="cuisineinter">
+              <em class="glyphicon"></em> Inter
             </button>
-            <button class="btn btn-default doAction" type="button" data-do="scan">
-              <em class="glyphicon"></em> Scan
+            <button class="btn btn-default doAction" type="button" data-do="cuisinefip">
+              <em class="glyphicon"></em> FIP
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="cuisineradioperfecto">
+              <em class="glyphicon"></em> Perfecto
             </button>
           </div>
+        </div>
+      </div>
+
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Ventilo</h2>
+          <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="fanOff">
+              <em class="glyphicon"></em> Off
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="fanOn">
+              <em class="glyphicon"></em> On
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="fanToogle">
+              <em class="glyphicon"></em> Toogle
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Divers</h2>
+          <div class="btn-group">
+
+              <button class="btn btn-default doAction" type="button" data-do="clean">
+                <em class="glyphicon"></em> Clean
+              </button>
+              <button class="btn btn-default doAction" type="button" data-do="scan">
+                <em class="glyphicon"></em> Scan
+              </button>
+          </div>
+        </div>
+      </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="btn-group">
 
           <h2>Actuel download preload speed : <?php echo $actualSpeed; ?></h2>
 
@@ -259,8 +330,11 @@ foreach ($infos as $timestamp => $values) {
               <em class="glyphicon"></em> High speed
             </button>
           </div>
+        </div>
+      </div>
 
-
+      <div class="row">
+        <div class="col-md-12">
           <h2>
             Logs
           </h2>
@@ -271,6 +345,8 @@ foreach ($infos as $timestamp => $values) {
         </div>
       </div>
     </div>
+    </div>
+
 <script type="text/javascript">
 
     function reloadPage()

@@ -4,9 +4,11 @@ require_once(__DIR__.'/denon.class.php');
 require_once(__DIR__.'/kodi.class.php');
 require_once(__DIR__.'/smartphone.class.php');
 require_once(__DIR__.'/raspberry.class.php');
+require_once(__DIR__.'/zigate.class.php');
 
 $d = new MyDenon();
 $k = new Kodi();
+$z = new Zigate();
 
 $cmd = $argv[1];
 $param = @$argv[2];
@@ -638,6 +640,57 @@ switch($cmd)
     $s->toogleFanState();
     break;
 
+
+
+
+  case "ledStripe1Toogle":
+    $device = 'ledstripe1';
+    $deviceCmd = 'toogle';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe1On":
+    $device = 'ledstripe1';
+    $deviceCmd = 'on';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe1Off":
+    $device = 'ledstripe1';
+    $deviceCmd = 'off';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe1White":
+    $device = 'ledstripe1';
+    $deviceCmd = 'white';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe1Yellow":
+    $device = 'ledstripe1';
+    $deviceCmd = 'yellow';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe1Low":
+    $device = 'ledstripe1';
+    $deviceCmd = 'low';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe1High":
+    $device = 'ledstripe1';
+    $deviceCmd = 'high';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
 
 }
 

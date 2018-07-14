@@ -121,6 +121,7 @@ class API {
             ]
         ];
         $context = stream_context_create($opt);
+        $aprams['recvWindow']= 10000000;
         $params['timestamp'] = number_format(microtime(true)*1000,0,'.','');
         if ( isset($params['wapi']) ) {
             unset($params['wapi']);

@@ -5,12 +5,16 @@ class Smartphone
 
   public function getIp()
   {
+    //lenovo
+    return "192.168.0.205";
+
+    //ZOPO
     return "192.168.0.208";
   }
 
   public function getBroadlinkApiEndpoind()
   {
-    return "192.168.0.208:9192";
+    return $this->getIp().":9192";
   }
 
   public function getFanMac()
@@ -18,18 +22,18 @@ class Smartphone
     return "34:ea:34:f4:c6:92";
   }
 
-  public function getFanState($tryLeft = 10)
+  public function getFanState($tryLeft = 3)
   {
     $url = "http://".$this->getBroadlinkApiEndpoind().'/'.$this->getFanMac().'/socketState/';
     $output = array();
-    $cmd = "timeout 2 curl -s ".escapeshellarg($url);
+    $cmd = "timeout 4 curl -s ".escapeshellarg($url);
     exec($cmd, $output);
     if(count($output) != 1)
     {
       if($tryLeft > 1) {
         return $this->getFanState($tryLeft - 1);
       }else{
-        echo "ERROR";
+        //echo "ERROR";
         return false;
       }
     }

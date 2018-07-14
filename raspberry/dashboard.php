@@ -1,6 +1,10 @@
 <?php
 require_once(__DIR__.'/denon.class.php');
 require_once(__DIR__.'/kodi.class.php');
+require_once(__DIR__.'/smartphone.class.php');
+require_once(__DIR__.'/zigate.class.php');
+
+$z = new Zigate();
 
 
 $action=@$_GET['action'];
@@ -56,7 +60,15 @@ $anthoSambaContent = glob('/servers/antho/home/simon/samba/*');
 $simulateCommand = 'rsync -n --timeout=115 --partial --inplace --append --recursive --bwlimit=2000 -vP /servers/chooo7/var/downloaded/ /media/data/downloaded';
 
 
-
+$smart = new Smartphone();
+$ventiloState = 'not detected';
+try {
+  $ventiloState = $smart->getFanState(1) == "1" ? "On" : "Off";
+}
+catch(Exception $e)
+{
+  $ventiloState = 'error';
+}
 require_once(__DIR__.'/coinmon.class.php');
 $cm = new Coinmon();
 $infos = $cm->getCalculatedValues();
@@ -281,7 +293,7 @@ foreach ($infos as $timestamp => $values) {
       <br />
       <div class="row">
         <div class="col-md-12">
-          <h2>Ventilo</h2>
+          <h2>Ventilo : <?php echo $ventiloState; ?></h2>
           <div class="btn-group">
             <button class="btn btn-default doAction" type="button" data-do="fanOff">
               <em class="glyphicon"></em> Off
@@ -291,6 +303,37 @@ foreach ($infos as $timestamp => $values) {
             </button>
             <button class="btn btn-default doAction" type="button" data-do="fanToogle">
               <em class="glyphicon"></em> Toogle
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Led strip 1</h2>
+          <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1Toogle">
+              <em class="glyphicon"></em> Toogle
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1On">
+              <em class="glyphicon"></em> On
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1Off">
+              <em class="glyphicon"></em> Off
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1White">
+              <em class="glyphicon"></em> White
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1Yellow">
+              <em class="glyphicon"></em> Yellow
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1High">
+              <em class="glyphicon"></em> high
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1Low">
+              <em class="glyphicon"></em> low
             </button>
           </div>
         </div>

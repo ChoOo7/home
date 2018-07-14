@@ -38,6 +38,8 @@ class Coinmon
     $cnt[time()]=$values;
     if(count($cnt) < 5)
     {
+      var_dump($cnt);
+      var_dump($values);
       echo('not enought data, strange !!!');
       throw new Exception('not enought data, strange !!!');
     }

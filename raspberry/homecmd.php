@@ -641,7 +641,107 @@ switch($cmd)
     break;
 
 
+  case "dashchangeledstate":
 
+    $filename = __DIR__.'dashchangeledstate.log';
+    $state = (int)file_get_contents($filename);
+    $state++;
+    file_put_contents($filename, $state);
+    $cmd = null;
+    switch($state % 6)
+    {
+      case 0:
+        $cmd = 'php '.__FILE__.' ledStripe2white';
+        passthru($cmd);
+        break;
+      case 1:
+        $cmd = 'php '.__FILE__.' ledStripe2Yellowlight';
+        passthru($cmd);
+        break;
+      case 2:
+        $cmd = 'php '.__FILE__.' ledStripe2Blue';
+        passthru($cmd);
+        break;
+      case 3:
+        $cmd = 'php '.__FILE__.' ledStripe2Red';
+        passthru($cmd);
+        break;
+      case 4:
+        $cmd = 'php '.__FILE__.' ledStripe2Green';
+        passthru($cmd);
+        break;
+      case 5:
+        $cmd = 'php '.__FILE__.' ledStripe2WhiteLight';
+        passthru($cmd);
+        break;
+    }
+    var_dump($cmd);
+
+    break;
+
+
+
+
+  case "ledStripe2Toogle":
+    $device = 'ledstripe2';
+    $deviceCmd = 'toogle';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe2On":
+    $device = 'ledstripe2';
+    $deviceCmd = 'on';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe2Off":
+    $device = 'ledstripe2';
+    $deviceCmd = 'off';
+    $retry = 3;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+  case "ledStripe2white":
+    $device = 'ledstripe2';
+    $deviceCmd = 'white';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+  case "ledStripe2Yellowlight":
+    $device = 'ledstripe2';
+    $deviceCmd = 'yellowlight';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+  case "ledStripe2WhiteLight":
+    $device = 'ledstripe2';
+    $deviceCmd = 'whitelight';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+
+  case "ledStripe2Blue":
+    $device = 'ledstripe2';
+    $deviceCmd = 'blue';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe2Red":
+    $device = 'ledstripe2';
+    $deviceCmd = 'red';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
+
+  case "ledStripe2Green":
+    $device = 'ledstripe2';
+    $deviceCmd = 'green';
+    $retry = 0;
+    $z->launchCommand($device, $deviceCmd, $retry);
+    break;
 
   case "ledStripe1Toogle":
     $device = 'ledstripe1';

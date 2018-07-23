@@ -9,4 +9,4 @@ logging.root.setLevel(logging.WARNING)
 import zigate
 z = zigate.ZiGate(port=None) # Leave None to auto-discover the port
 
-z.action_move_level_onoff('b89c',11, 1, 2);
+z.actions_move_temperature('ee65', 3, 6500);

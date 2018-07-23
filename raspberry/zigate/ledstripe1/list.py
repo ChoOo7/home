@@ -9,4 +9,10 @@ logging.root.setLevel(logging.WARNING)
 import zigate
 z = zigate.ZiGate(port=None) # Leave None to auto-discover the port
 
-z.action_move_level_onoff('b89c',11, 1, 2);
+# refresh devices list
+
+z.get_devices_list()
+print(z.devices)
+print('endpoints')
+print(z.devices[0].endpoints)
+#print(z.devices[1].endpoints)

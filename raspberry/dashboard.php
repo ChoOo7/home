@@ -340,6 +340,39 @@ foreach ($infos as $timestamp => $values) {
       </div>
 
 
+
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Led strip 2</h2>
+          <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe2Toogle">
+              <em class="glyphicon"></em> Toogle
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe2On">
+              <em class="glyphicon"></em> On
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe2Off">
+              <em class="glyphicon"></em> Off
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="dashchangeledstate">
+              <em class="glyphicon"></em> State
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1Yellow">
+              <em class="glyphicon"></em> Yellow
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1High">
+              <em class="glyphicon"></em> high
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="ledStripe1Low">
+              <em class="glyphicon"></em> low
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+
       <br />
       <div class="row">
         <div class="col-md-12">

@@ -1,0 +1,22 @@
+*/3 * * * * /var/home/raspberry/preloadFromSeedbox.php >> /var/home/raspberry/preloadLog
+#0 7 * * * /var/home/raspberry/preloadSetSpeed.php 5000
+30 7 * * * /var/home/raspberry/preloadSetSpeed.php 2000
+#59 3 * * * /var/home/raspberry/preloadResetCurrentSpeed.php
+* * * * * mount /servers/chooo7/ > /dev/null
+* * * * * mount /servers/antho/ > /dev/null
+* * * * * mv /media/data/torrents/* /servers/chooo7/tmp/torrents/
+2 10 * * * /bin/cp /var/home/raspberry/coinsInfo.json /var/coinsInfo.json.backup
+
+16 20 * * * /bin/cp /var/home/raspberry/coinsInfo.json /var/coinsInfo.json.backup2
+
+2 23 */3 * * /bin/cp /var/home/raspberry/coinsInfo.json /var/coinsInfo.json.backup3
+
+
+
+
+27 */2 * * * /usr/bin/killall php
+
+0 7 * * * cd /var/local_www/ecommerce-scraper/ && /var/local_www/ecommerce-scraper/bin/flo.sh > /tmp/scrapp.log
+0 * * * * /var/local_www/mail/run.sh > /dev/null
+*/5 * * * * /usr/bin/curl 'http://dashboard.home.chooo7.com/coins2.php' > /dev/null
+*/10 * * * * /usr/bin/curl 'http://dashboard.home.chooo7.com/coinsclean.php' > /dev/null

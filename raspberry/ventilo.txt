@@ -1,0 +1,46 @@
+curl -X POST -H "x-ha-access: vv3w5fn3" \
+       -H "Content-Type: application/json" \
+       -d '{"state": "20", "attributes": {"unit_of_measurement": "°C", "friendly_name": "Bathroom Temp"}}' \
+       http://home.chooo7.com:8123/api/states/sensor.bathroom_temperature
+
+
+curl -X POST -H "x-ha-access: vv3w5fn3" \
+       -H "Content-Type: application/json" \
+       -d '{"state": "25", "attributes": {"unit_of_measurement": "°C", "friendly_name": "Manon Temp"}}' \
+       http://home.chooo7.com:8123/api/states/sensor.manon_temperature
+
+curl -X POST -H "x-ha-access: vv3w5fn3" \
+       -H "Content-Type: application/json" \
+       -d '{"state": "off", "attributes": {"unit_of_measurement": "state", "friendly_name": "Manon Ventilo"}}' \
+       http://home.chooo7.com:8123/api/states/sensor.manon_ventilo
+
+curl 'http://192.168.0.201/dashboard.php?action=ventiloOff'
+curl 'http://192.168.0.201/dashboard.php?action=ventiloOn'
+
+
+
+
+curl 'http://192.168.0.201/dashboard.php?action=ventiloGet'
+
+
+
+
+curl -X POST -H "x-ha-access: vv3w5fn3" \
+       -H "Content-Type: application/json" \
+       -d '{"state": "28", "attributes": {"unit_of_measurement": "°C", "friendly_name": "Manon Temp"}}' \
+       http://home.chooo7.com:8123/api/states/sensor.manon_temperature
+
+
+curl -X POST -H "x-ha-access: vv3w5fn3" \
+       -H "Content-Type: application/json" \
+       -d '{"state": "20", "attributes": {"unit_of_measurement": "°C", "friendly_name": "Manon Temp"}}' \
+       http://home.chooo7.com:8123/api/states/sensor.manon_temperature
+
+
+curl -H "x-ha-access: vv3w5fn3" \
+       -H "Content-Type: application/json" \
+       http://home.chooo7.com:8123/api/states/switch.manon_arest_pin_four
+
+curl -H "x-ha-access: vv3w5fn3" \
+       -H "Content-Type: application/json" \
+       http://home.chooo7.com:8123/api/states/sensor.manon_temperature

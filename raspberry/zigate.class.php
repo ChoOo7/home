@@ -4,7 +4,6 @@ class ZiGate
   
   public function launchCommand($device, $deviceCmd, $retry = 3)
   {
-
     $cmd = null;
     if(file_exists(__DIR__.'/zigate/'.$device.'/'.$deviceCmd.'.php'))
     {

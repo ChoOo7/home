@@ -78,7 +78,7 @@ if(array_key_exists("binance", $config) && $config["binance"]["key"]) {
 
     if( ! array_key_exists($name, $coinsPrice))
     {
-      $coinsPrice[$name] = $info['btcTotal'] / $av;
+      //$coinsPrice[$name] = $info['btcTotal'] / $av;
     }
 
     if( ! array_key_exists($name, $coins))
@@ -124,7 +124,8 @@ foreach($coins as $cryptoName=>$coinNumber)
   );
   $totalValue += $valueOfMyCoins;
 }
-
+var_dump($output);
+var_dump($totalValue);
 $cm->saveCalculatedValues($output);
 
 var_dump($output);

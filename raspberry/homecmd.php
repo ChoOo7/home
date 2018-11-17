@@ -1,19 +1,94 @@
 <?php
+header('Access-Control-Allow-Origin: *');
 
+
+while(ob_get_level())
+{
+  ob_end_flush();
+}
 require_once(__DIR__.'/denon.class.php');
 require_once(__DIR__.'/kodi.class.php');
 require_once(__DIR__.'/smartphone.class.php');
 require_once(__DIR__.'/raspberry.class.php');
 require_once(__DIR__.'/zigate.class.php');
+require_once(__DIR__.'/mpd.class.php');
+
+
+$clicWaitTime = 1.5;
 
 $d = new MyDenon();
 $k = new Kodi();
 $z = new Zigate();
+$mpd = new Mpd();
 
-$cmd = $argv[1];
-$param = @$argv[2];
+
+$cmd = null;
+if(isset($_GET['action']))
+{
+  $cmd = $_GET['action'];
+}else {
+  $cmd = $argv[1];
+  $param = @$argv[2];
+}
+
+function detectClicNumber($btnName)
+{
+  global $clicWaitTime;
+  $filePath = "/tmp/".$btnName;
+  if( ! file_exists($filePath))
+  {
+    file_put_contents($filePath, "1");
+    sleep($clicWaitTime);
+    $nbClic = file_get_contents($filePath);
+
+    $cmd = "php ".__DIR__."/homecmd.php ".$btnName.'-'.$nbClic;
+    passthru($cmd);
+
+    unlink($filePath);
+  }else{
+    $nbClic = file_get_contents($filePath);
+    $nbClic++;
+    file_put_contents($filePath, $nbClic);
+  }
+}
+
 switch($cmd)
 {
+  case "btn1":case "btn2":
+    detectClicNumber($cmd);
+    break;
+
+  case "btn1-1":
+    $cmd = "php ".__DIR__."/homecmd.php castor";
+    echo "\n".$cmd."\n";
+    passthru($cmd);
+    break;
+
+  case "btn1-2":
+    $cmd = "php ".__DIR__."/homecmd.php trotro";
+    echo "\n".$cmd."\n";
+    passthru($cmd);
+    break;
+
+  case "btn1-3":
+    $cmd = "php ".__DIR__."/homecmd.php tata";
+    echo "\n".$cmd."\n";
+    passthru($cmd);
+    break;
+
+  case "btn1-4":
+    $cmd = "php ".__DIR__."/homecmd.php off";
+    echo "\n".$cmd."\n";
+    passthru($cmd);
+    break;
+
+  case "btn2-1":
+    echo "2-1";
+    break;
+
+  case "btn2-2":
+    echo "2-2";
+    break;
 
   case "downloadSpeedSlow":
   case "slow":
@@ -40,17 +115,54 @@ switch($cmd)
 
   case "tooglefranceintercreatived80":
   case "cuisineinter":
-    $url ="http://direct.franceinter.fr/live/franceinter-midfi.mp3";
-    $r = new Raspberry();
-    $r->vlcToogle($url);
+
+    if( ! $mpd->isPlayingInter())
+    {
+
+      $mpd->isPlayingInter(true);
+
+      $mpd->clearPlaylist();
+      $mpd->addRemoteM3u8("http://direct.franceinter.fr/live/franceinter-midfi.mp3");
+      $mpd->setShuffle(false);
+      $mpd->play();
+      $mpd->setMpcSourceMopidy();
+
+      $mpd->cuisineOn();
+      $mpd->denonOff();
+
+      $d->powerOff();
+
+      $d->volumeSet(15);
+    }else{
+      $mpd->isPlayingInter(false);
+
+      $mpd->clearPlaylist();
+      $mpd->stop();
+      $mpd->cuisineOff();
+    }
     break;
 
 
   case "tooglefipcreatived80":
   case "cuisinefip":
+
+    $mpd->clearPlaylist();
+    $mpd->addRemoteM3u8("http://direct.fipradio.fr/live/fip-webradio1.mp3");
+    $mpd->setShuffle(false);
+    $mpd->play();
+    $mpd->setMpcSourceMopidy();
+
+    $mpd->cuisineOn();
+    $mpd->denonOff();
+
+    $d->powerOff();
+
+    $d->volumeSet(15);
+    /*
     $url = "http://direct.fipradio.fr/live/fip-webradio1.mp3";
     $r = new Raspberry();
     $r->vlcToogle($url);
+    */
     break;
 
 
@@ -242,27 +354,35 @@ switch($cmd)
   case "tro":
   case "trotro":
   case "troTro":
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(822);
-    $k->setShuffle();
-    $k->playPlaylist();
 
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(822);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    $d->volumeSet(15);
+  $d->powerOnAndWaitForRead();
+  $d->setDigitIn();
+  $d->volumeSet(15);
+  /*
+  $k->clearPlaylist();
+  $k->setShuffle();
+  $k->addArtistToPlaylist(827);
+  $k->setShuffle();
+  $k->playPlaylist();
+  $k->setShuffle();
+  */
+
+  $mpd->clearPlaylist();
+  $mpd->addArtistToPlaylist("troTro");
+  $mpd->setShuffle(true);
+  $mpd->play();
+  $mpd->setMpcSourceMopidy();
+
+  $mpd->cuisineOff();
+  $mpd->denonOn();
+
+  $d->volumeSet(15);
     break;
 
   case "henri":
   case "des":
   case "henrides":
+  case "henrisdes":
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(828);
@@ -272,12 +392,25 @@ switch($cmd)
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
+    /*
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(828);
     $k->setShuffle();
     $k->playPlaylist();
     $k->setShuffle();
+    $d->volumeSet(15);
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addArtistToPlaylist("henrisDes");
+    $mpd->setShuffle(true);
+    $mpd->play();
+    $mpd->setMpcSourceMopidy();
+
+    $mpd->cuisineOff();
+    $mpd->denonOn();
+
     $d->volumeSet(15);
     break;
 
@@ -287,6 +420,7 @@ switch($cmd)
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
+    /*
     $k->clearPlaylist();
     $k->setShuffle(false);
     $k->addArtistToPlaylist(820);
@@ -294,6 +428,18 @@ switch($cmd)
     $k->playPlaylist();
     $k->setShuffle(false);
     $d->volumeSet(15);
+    */
+
+  $mpd->clearPlaylist();
+  $mpd->addArtistToPlaylist("Tata Marthe");
+  $mpd->setShuffle(false);
+  $mpd->play();
+  $mpd->setMpcSourceMopidy();
+
+  $mpd->cuisineOff();
+  $mpd->denonOn();
+
+  $d->volumeSet(13);
     break;
 
   case "oui":
@@ -302,6 +448,7 @@ switch($cmd)
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
+    /*
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(821);
@@ -309,6 +456,19 @@ switch($cmd)
     $k->playPlaylist();
     $k->setShuffle();
     $d->volumeSet(15);
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addArtistToPlaylist("ouiOui");
+    $mpd->setShuffle(true);
+    $mpd->play();
+    $mpd->setMpcSourceMopidy();
+
+    $mpd->cuisineOff();
+    $mpd->denonOn();
+
+    $d->volumeSet(15);
+
     break;
 
 
@@ -344,12 +504,24 @@ switch($cmd)
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
+    /*
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(824);
     $k->setShuffle();
     $k->playPlaylist();
     $k->setShuffle();
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addArtistToPlaylist("PeppaPig");
+    $mpd->setShuffle(true);
+    $mpd->play();
+    $mpd->setMpcSourceMopidy();
+
+    $mpd->cuisineOff();
+    $mpd->denonOn();
+
     $d->volumeSet(15);
     break;
 
@@ -358,6 +530,7 @@ switch($cmd)
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
+    /*
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(823);
@@ -365,22 +538,135 @@ switch($cmd)
     $k->playPlaylist();
     $k->setShuffle();
     $d->volumeSet(15);
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addArtistToPlaylist("pouleRousse");
+    $mpd->setShuffle(true);
+    $mpd->play();
+    $mpd->setMpcSourceMopidy();
+
+    $mpd->cuisineOff();
+    $mpd->denonOn();
     break;
-  
+
   case "castor":
   case "pereCastor":
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
+    /*
     $k->clearPlaylist();
     $k->setShuffle();
     $k->addArtistToPlaylist(827);
     $k->setShuffle();
     $k->playPlaylist();
     $k->setShuffle();
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addArtistToPlaylist("pereCastor");
+    $mpd->setShuffle(true);
+    $mpd->play();
+    $mpd->setMpcSourceMopidy();
+
+    $mpd->cuisineOff();
+    $mpd->denonOn();
+
     $d->volumeSet(15);
     break;
 
+  case "cuisineOn":
+    $mpd->cuisineOn();
+    break;
+  case "cuisineOff":
+    $mpd->cuisineOff();
+    break;
+
+  case "salonOn":
+  case "denonOn":
+    $mpd->denonOn();
+    break;
+  case "denonOff":
+  case "salonOff":
+    $mpd->denonOff();
+    $d->powerOff();
+    break;
+
+  case "camille":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    /*
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(827);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addSpotifyArtist("camille");
+    $mpd->setShuffle(true);
+    $mpd->play();
+
+    $mpd->cuisineOn();
+    $mpd->denonOn();
+
+    $d->volumeSet(15);
+    break;
+
+  case "floyd":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    /*
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(827);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addIcecastToMpd();
+    $mpd->addSpotifyArtist("Pink Floyd");
+    $mpd->setShuffle(true);
+    $mpd->play();
+
+    $mpd->cuisineOn();
+    $mpd->denonOn();
+
+    $d->volumeSet(15);
+    break;
+
+  case "vargas":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+    /*
+    $k->clearPlaylist();
+    $k->setShuffle();
+    $k->addArtistToPlaylist(827);
+    $k->setShuffle();
+    $k->playPlaylist();
+    $k->setShuffle();
+    */
+
+    $mpd->clearPlaylist();
+    $mpd->addSpotifyArtist("Chavela vargas");
+    $mpd->setShuffle(true);
+    $mpd->play();
+
+    $mpd->cuisineOn();
+    $mpd->denonOn();
+    
+
+    $d->volumeSet(15);
+    break;
+    
 
   case "croc":
   case "crocodile":

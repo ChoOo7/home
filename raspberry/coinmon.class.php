@@ -3,6 +3,12 @@ class Coinmon
 {
   public function getCryptoValueInEuro($crypto, $tryLeft = 5)
   {
+    static $_cache = array();
+    $_key = $crypto;
+    if(array_key_exists($_key, $_cache))
+    {
+      return $_cache[$_key];
+    }
     if($crypto == "ZEUR")
     {
       return 1;
@@ -10,6 +16,10 @@ class Coinmon
     if($crypto == "XBT")
     {
       $crypto = "BTC";
+    }
+    if($crypto == "IOTA")
+    {
+      $crypto = "MIOTA";
     }
     ob_start();
     $cmd = 'coinmon -c eur -f '.escapeshellarg($crypto).' | grep '.escapeshellarg($crypto);
@@ -21,13 +31,26 @@ class Coinmon
     $output = implode("\n", $output);
     $tmp = explode('│', $output);
 
-    $price = (float)trim($tmp[2]);
+    $price = trim($tmp[2]);
+    //var_dump('before', $price);
+    $price = preg_replace('![^0-9.,]!is', '', $price);
+
+    //var_dump('replaced', $price);
+    /*
+    $price = preg_match('!([0-9.,]*)!is', $price, $matches);
+    var_dump('matches', $matches);
+    */
+    $price = (float) $price;
+    //var_dump($price);
     if($price == 0.0 && $tryLeft > 0)
     {
-      var_dump($cmd);var_dump($output);
+      var_dump($tmp);
+      var_dump($cmd);
+      var_dump($output);
       return $this->getCryptoValueInEuro($crypto, $tryLeft-1);
     }
 
+    $_cache[$_key] = $price;
     return $price;
   }
 

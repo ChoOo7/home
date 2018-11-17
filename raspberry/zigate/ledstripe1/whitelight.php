@@ -1,7 +1,9 @@
 <?php
+
 require(__DIR__."/include.php");
 
-$payload = '{"function": "action_onoff", "args": ["ee65", 3, 2]}';
+
+$payload = '{"function": "actions_move_temperature", "args": ["b89c", 11, 7400]}';
 $mqtt->publish("zigate/command", $payload, 0);
 
 $mqtt->close();

@@ -104,6 +104,7 @@ class API {
                 "header" => "User-Agent: Mozilla/4.0 (compatible; PHP Binance API)\r\n"
             ]
         ];
+        var_dump($params);
         $context = stream_context_create($opt);
         $query = http_build_query($params, '', '&');
         return json_decode(file_get_contents($this->base.$url.'?'.$query, false, $context), true);
@@ -121,7 +122,9 @@ class API {
             ]
         ];
         $context = stream_context_create($opt);
-        $aprams['recvWindow']= 10000000;
+        $aprams['recvWindow']= 10000000000;
+        //$aprams['recvWindow']= 1000;
+        var_dump($aprams);
         $params['timestamp'] = number_format(microtime(true)*1000,0,'.','');
         if ( isset($params['wapi']) ) {
             unset($params['wapi']);
@@ -179,6 +182,10 @@ class API {
     private function balanceData($array, $priceData = false) {
         if ( $priceData ) $btc_value = $btc_total = 0.00;
         $balances = [];
+        if( ! array_key_exists('balances', $array))
+        {
+            var_dump($array);
+        }
         foreach ( $array['balances'] as $obj ) {
             $asset = $obj['asset'];
             $balances[$asset] = ["available"=>$obj['free'], "onOrder"=>$obj['locked'], "btcValue"=>0.00000000, "btcTotal"=>0.00000000];

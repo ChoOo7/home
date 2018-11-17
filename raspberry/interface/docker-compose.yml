@@ -1,0 +1,15 @@
+version: '2'
+services:
+    home:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: home
+        command: "npm run --unsafe-perm start"
+        #command: "sleep 993600"
+        volumes:
+            - ./src:/usr/src/src
+            - ./dist:/usr/src/dist
+
+        ports:
+            - "8012:8012"

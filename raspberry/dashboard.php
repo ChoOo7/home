@@ -339,6 +339,27 @@ foreach ($infos as $timestamp => $values) {
         </div>
       </div>
 
+      <br />
+      <div class="row">
+        <div class="col-md-12">
+          <h2>MPD</h2>
+          <div class="btn-group">
+            <button class="btn btn-default doAction" type="button" data-do="cuisineOn">
+              <em class="glyphicon"></em> Cuisine ON
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="cuisineOff">
+              <em class="glyphicon"></em> Cuisine Off
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="denonOn">
+              <em class="glyphicon"></em> Denon ON
+            </button>
+            <button class="btn btn-default doAction" type="button" data-do="denonOff">
+              <em class="glyphicon"></em> Denon Off
+            </button>
+          </div>
+        </div>
+      </div>
+
 
 
       <br />

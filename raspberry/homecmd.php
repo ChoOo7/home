@@ -13,6 +13,7 @@ require_once(__DIR__.'/raspberry.class.php');
 require_once(__DIR__.'/zigate.class.php');
 require_once(__DIR__.'/mpd.class.php');
 
+$dataDirectory = __DIR__.'/data/';
 
 $clicWaitTime = 1.5;
 
@@ -23,12 +24,19 @@ $mpd = new Mpd();
 
 
 $cmd = null;
+$param = null;
 if(isset($_GET['action']))
 {
   $cmd = $_GET['action'];
 }else {
   $cmd = $argv[1];
   $param = @$argv[2];
+}
+
+function launchInBackground($cmd)
+{
+  $cmd = 'nohup '.$cmd.' > /tmp/output &';
+  system($cmd);
 }
 
 function detectClicNumber($btnName)
@@ -90,6 +98,38 @@ switch($cmd)
     echo "2-2";
     break;
 
+
+  case 'ikeaLamp1On':
+    $command = 'php /var/home/raspberry/zigate/ikealampe1/on.php';
+    launchInBackground($command);
+    break;
+  case 'ikeaLamp1Off':
+    $command = 'php /var/home/raspberry/zigate/ikealampe1/off.php';
+    launchInBackground($command);
+    break;
+  case 'ikeaLamp1Toogle':
+    $command = 'php /var/home/raspberry/zigate/ikealampe1/toogle.php';
+    launchInBackground($command);
+    break;
+  case 'ikeaLamp1High':
+    $command = 'php /var/home/raspberry/zigate/ikealampe1/high.php';
+    launchInBackground($command);
+    break;
+  case 'ikeaLamp1Medium':
+    $command = 'php /var/home/raspberry/zigate/ikealampe1/medium.php';
+    launchInBackground($command);
+    break;
+  case 'ikeaLamp1Low':
+    $command = 'php /var/home/raspberry/zigate/ikealampe1/low.php';
+    launchInBackground($command);
+    break;
+
+
+  case 'movementDetected':
+    $command = 'php /var/home/raspberry/homecmd.php ikeaLamp1On';
+    launchInBackground($command);
+    break;
+
   case "downloadSpeedSlow":
   case "slow":
     $downloadSpeed = 200;
@@ -104,11 +144,26 @@ switch($cmd)
     passthru($command);
     break;
 
-
   case "downloadSpeedNormal":
   case "normal":
     $downloadSpeed = 2000;
     $command = 'php /var/home/raspberry/preloadSetSpeed.php '.escapeshellarg($downloadSpeed);
+    passthru($command);
+    break;
+
+  case 'setTemperature':
+  case 'setHumidity':
+  case 'setPressure':
+  case 'setLuminosity':
+    $paramName = strtolower(str_replace('set', '', $cmd));
+    $data = $param;
+    file_put_contents($dataDirectory.'/'.$paramName, $data);
+    break;
+
+
+  case "setPressure":
+    $downloadSpeed = 50000;
+    $command = 'sudo service zigatelistener restart';
     passthru($command);
     break;
 

@@ -6,6 +6,9 @@ $username = "";                   // set your username
 $password = "";                   // set your password
 
 
+$startTime = time();
+$ignoreStartDuration = 10;
+
 /*
 $client_id = "phpMQTT-subscriber.".__FILE__.'-'.uniqid(); // make sure this is unique for connecting to sever - you could use uniqid()
 $mqtt = new \Bluerhinos\phpMQTT($server, $port, $client_id);
@@ -20,6 +23,13 @@ if(!$mqtt->connect(true, NULL, $username, $password)) {
 */
 
 function procmsg($topic, $msg){
+  global $startTime, $ignoreStartDuration;
+
+  if(time() - $ignoreStartDuration < $startTime)
+  {
+    echo "\nStarting, msg ignored\n";
+    return ;
+  }
   //echo "Msg Recieved: " . date("r") . "\n";
   //echo "Topic: {$topic}\n\n";
   //echo "\t$msg\n\n";
@@ -57,6 +67,27 @@ function procmsg($topic, $msg){
       }
     }
 
+  }elseif(strpos($topic, '/b9ef/') !== false) {
+    $decoded = json_decode($msg, true);
+    var_dump("Temp", $decoded);
+    switch(@$decoded['name'])
+    {
+      case "temperature":
+        $temp = $decoded["value"];
+        $cmd = 'php /var/home/raspberry/homecmd.php setTemperature '.escapeshellarg($temp);
+        exec($cmd, $output);
+        break;
+      case "humidity":
+        $temp = $decoded["value"];
+        $cmd = 'php /var/home/raspberry/homecmd.php setHumidity '.escapeshellarg($temp);
+        exec($cmd, $output);
+        break;
+      case "pressure":
+        $temp = $decoded["value"];
+        $cmd = 'php /var/home/raspberry/homecmd.php setPressure '.escapeshellarg($temp);
+        exec($cmd, $output);
+        break;
+    }
   }elseif($topic == 'zigate/attribute_changed/62ce/01/0006/0000')
   {
 
@@ -66,16 +97,26 @@ function procmsg($topic, $msg){
       $cmd = 'php /var/home/raspberry/homecmd.php dashchangeledstate';
       exec($cmd, $output);
     }
-  }elseif($topic == 'zigate/attribute_changed/be02/01/0400/0000') {
-    echo "\nCapteur 1\t";
+  }elseif(stripos($topic, 'be02') !== false){
+    echo "\nCapteur présence 1\t";
 
     $decoded = json_decode($msg, true);
-    $luminosity = $decoded['value'];
+    switch(@$decoded['name'])
+    {
+      case 'luminosity':
+        $temp = $value = $decoded['value'];
+        $cmd = 'php /var/home/raspberry/homecmd.php setLuminosity '.escapeshellarg($temp);
+        exec($cmd, $output);
+        break;
+      case 'presence':
+        echo "\tPresence detectée\t";
+        $temp = $value = $decoded['value'];
+        $cmd = 'php /var/home/raspberry/homecmd.php movementDetected ';
+        exec($cmd, $output);
+        break;
+    }
 
-    echo "\tPresence detectée\t";
 
-    $cmd = 'php /var/home/raspberry/homecmd.php ledStripe2Toogle';
-    exec($cmd, $output);
   }else{
     //var_dump($topic);
 

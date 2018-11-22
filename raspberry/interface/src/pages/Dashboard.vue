@@ -1,6 +1,8 @@
 <template>
   <div class="home">
-    <i class="el-icon-loading" v-if="loadingCounter"></i>
+    <div class="loadingZone">
+      <i class="el-icon-loading" v-if="loadingCounter"></i>
+    </div>
     <el-row>
       <el-col :span="24">
         <el-tabs type="border-card">
@@ -41,7 +43,7 @@
           <el-tab-pane label="Manon">
 
             <el-button-group>
-              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="castor">Pere Castore</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="castor">Pere Castor</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="yakari">Yakari</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="trotro">Tro tro</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ouioui">Oui oui</el-button>
@@ -64,7 +66,7 @@
             <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="downloadSpeedSlow">Slow speed</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="downloadSpeedNormal">Normal speed</el-button>
-              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="downloadSpeedHigh">Hight speed</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="downloadSpeedHigh">High speed</el-button>
             </el-button-group>
 
             <div class="logs">
@@ -74,6 +76,33 @@
             </div>
 
           </el-tab-pane>
+
+          <el-tab-pane label="Daemon">
+
+            <el-button-group>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartZigateListener">Restart zigatelistener</el-button>
+            </el-button-group>
+          </el-tab-pane>
+
+
+          <el-tab-pane label="Sensors">
+            <div>
+              <h3>Temperature : {{ sensors.temperature }}</h3>
+              <h3>Humidité : {{ sensors.humidity }}</h3>
+              <h3>Pression : {{ sensors.pressure }}</h3>
+              <h3>Luminosité : {{ sensors.luminosity }}</h3>
+            </div>
+
+          </el-tab-pane>
+
+
+
+          <el-tab-pane label="Download">
+
+            <iframe width="90%" height="90%" src="./downloaded/"></iframe>
+          </el-tab-pane>
+
+
 
         </el-tabs>
 
@@ -101,6 +130,18 @@ import Vue from 'vue'
         mounts: {
           chooo7: true,
           antho: true
+        },
+        daemons_state: {
+          zigate_listener: true,
+          zigate_broker: true,
+          mpc: true,
+          mmpc: true,
+        },
+        sensors: {
+          temperature: "loading",
+          pression: "loading",
+          humidity: "loading",
+          luminosity: "loading"
         }
       }
     },
@@ -115,8 +156,72 @@ import Vue from 'vue'
           });
         }else{
           this.$notify.error({
-            title: 'Mount Chooo7',
+            title: 'Mount Chooo7 DEAD',
             message: 'Le point de montage chooo7 est défaillant',
+            duration: 0
+          });
+        }
+      },
+      "daemons_state.zigate_listener": function() {
+        var self = this;
+        if(self.daemons_state.zigate_listener) {
+          this.$notify.success({
+            title: 'Zigate Listener OK',
+            message: 'Zigate Listenerest OK',
+            duration: 0
+          });
+        }else{
+          this.$notify.error({
+            title: 'Zigate Listener DEAD',
+            message: 'Zigate Listener est défaillant',
+            duration: 0
+          });
+        }
+      },
+      "daemons_state.zigate_broker": function() {
+        var self = this;
+        if(self.daemons_state.zigate_broker) {
+          this.$notify.success({
+            title: 'zigate_broker OK',
+            message: 'zigate_broker est OK',
+            duration: 0
+          });
+        }else{
+          this.$notify.error({
+            title: 'zigate_broker DEAD',
+            message: 'zigate_broker est défaillant',
+            duration: 0
+          });
+        }
+      },
+      "daemons_state.mpc": function() {
+        var self = this;
+        if(self.daemons_state.mpc) {
+          this.$notify.success({
+            title: 'MPC OK',
+            message: 'MPC est OK',
+            duration: 0
+          });
+        }else{
+          this.$notify.error({
+            title: 'MPC DEAD',
+            message: 'MPC est défaillant',
+            duration: 0
+          });
+        }
+      },
+      "daemons_state.mmpc": function() {
+        var self = this;
+        if(self.daemons_state.mmpc) {
+          this.$notify.success({
+            title: 'Mopidy OK',
+            message: 'Mopidy est OK',
+            duration: 0
+          });
+        }else{
+          this.$notify.error({
+            title: 'Mopidy DEAD',
+            message: 'Mopidy est défaillant',
             duration: 0
           });
         }
@@ -132,7 +237,9 @@ import Vue from 'vue'
         var self = this;
         self.loadMountStates();
         self.loadDownloadState();
-        setTimeout(function() {self.refreshInformations();}, 5000);
+        self.loadDaemonState();
+        self.loadSensorState();
+        setTimeout(function() {self.refreshInformations();}, 10000);
       },
 
       loadMountStates: function() {
@@ -150,9 +257,6 @@ import Vue from 'vue'
             self.loadingCounter--;
             console.error(error);
         });
-
-
-
       },
 
       loadDownloadState: function() {
@@ -160,19 +264,53 @@ import Vue from 'vue'
         self.loadingCounter++;
         self.$http.get(dashboardBaseUrl+"downloadstate.php?config=chooo7").then(response => {
           self.loadingCounter--;
-          self.downloadLogs = response.body.logs;
-          self.downloadSpeed = response.body.speed;
+        self.downloadLogs = response.body.logs;
+        self.downloadSpeed = response.body.speed;
+      }, error => {
+          self.loadingCounter--;
+          console.error(error);
+        });
+
+      },
+
+
+      loadDaemonState: function() {
+        var self = this;
+        self.loadingCounter++;
+        self.$http.get(dashboardBaseUrl+"daemonstate.php?config=chooo7").then(response => {
+          self.loadingCounter--;
+        self.daemons_state = response.body;
+      }, error => {
+          self.loadingCounter--;
+          console.error(error);
+        });
+
+      },
+
+
+
+      loadSensorState: function() {
+        var self = this;
+        self.loadingCounter++;
+        self.$http.get(dashboardBaseUrl+"sensorstate.php?config=chooo7").then(response => {
+          self.loadingCounter--;
+          self.sensors = response.body;
         }, error => {
           self.loadingCounter--;
           console.error(error);
         });
 
       },
+
       launchAction: function(evt)
       {
         var self=this;
         var action = jQuery(evt.target).attr('data-do');
-        console.log('evt', action, evt);
+        if(action == null)
+        {
+          action = jQuery(evt.target).parents('.el-button').attr('data-do');
+        }
+        
         self.loadingCounter++;
         self.$http.get(dashboardBaseUrl+"homecmd.php?action="+action).then(response => {
           self.loadingCounter--;
@@ -191,6 +329,15 @@ import Vue from 'vue'
 <style scoped lang="scss">
 
   @import '../../node_modules/element-theme-default/lib/index.css';
+  .home{
+    .loadingZone
+    {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      font-size: 20px;
+    }
+  }
   .picture-player
  {
    .main-picture

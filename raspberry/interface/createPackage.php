@@ -32,5 +32,10 @@ passthru($cmd);
 
 $files = glob($distDir.'/*');
 foreach($files as $file) {
-  copy($file, $targetDir . DIRECTORY_SEPARATOR . basename($file));
+  @copy($file, $targetDir . DIRECTORY_SEPARATOR . basename($file));
+}
+
+$files = glob($distDir.'/fonts/*');
+foreach($files as $file) {
+  copy($file, $targetDir . DIRECTORY_SEPARATOR . 'fonts' . DIRECTORY_SEPARATOR . basename($file));
 }

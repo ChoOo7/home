@@ -18,5 +18,12 @@ class ZiGate
     {
       $this->launchCommand($device, $deviceCmd, $retry - 1);
     }
-  }  
+  }
+
+  public function setLampToIntensity($addr, $cluster, $level)
+  {
+    $cmd =  "php ".__DIR__."/zigate/lamp/setIntensity.php ".escapeshellarg($addr)." ".escapeshellarg($cluster)." ".escapeshellarg($level);
+    passthru($cmd);
+  }
+
 }

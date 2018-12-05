@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../broker.php");
+require(__DIR__ . "/../../libs/broker.php");
 $server = "127.0.0.1";     // change if necessary
 $port = 1883;                     // change if necessary
 $username = "";                   // set your username

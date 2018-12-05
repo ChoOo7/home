@@ -14,6 +14,23 @@
               <el-button icon="el-icon-minus" class="launchAction" v-on:click.stop.prevent="launchAction" data-do="volumeDown"></el-button>
               <el-button icon="el-icon-plus" class="launchAction" v-on:click.stop.prevent="launchAction" data-do="volumeUp"></el-button>
             </el-button-group>
+            <br />
+            <h3>Temperature : {{ sensors.temperature }}</h3>
+            <br />
+            <el-button-group>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="castor">Pere Castor</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="pig">Peppa pig</el-button>
+            </el-button-group>
+            <br />
+            <el-button-group>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ikeaLamp1On">Lamp ON</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ikeaLamp1High">High</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ikeaLamp1Medium">Medium</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ikeaLamp1Low">Low</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ikeaLamp1Off">Lamp OFF</el-button>
+            </el-button-group>
+            <el-slider v-model="ikea1LampIntensity"></el-slider>
+
           </el-tab-pane>
 
           <el-tab-pane label="Radio">
@@ -40,10 +57,22 @@
           </el-tab-pane>
 
 
+          <el-tab-pane label="Switchs">
+
+            <el-button-group>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="chauffageOn">Chauffage ON</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="chauffageOff">Chauffage OFF</el-button>
+            </el-button-group>
+
+          </el-tab-pane>
+
+
           <el-tab-pane label="Manon">
 
             <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="castor">Pere Castor</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="belleBete">La belle et la bete</el-button>
+
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="yakari">Yakari</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="trotro">Tro tro</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ouioui">Oui oui</el-button>
@@ -56,6 +85,31 @@
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="poulerousse">Poule rousse</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="poulerousse">Histoire</el-button>
             </el-button-group>
+          </el-tab-pane>
+
+
+
+
+          <el-tab-pane label="Nous">
+            <el-button-group>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="camille">Camille</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="floyd">Pink floyd</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="tetesRaides">Tetes raides</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="hang">Hang massive</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="vargas">Vargas</el-button>
+            </el-button-group>
+
+          </el-tab-pane>
+
+
+          <el-tab-pane label="Sensors">
+            <div>
+              <h3>Temperature : {{ sensors.temperature }}</h3>
+              <h3>Humidité : {{ sensors.humidity }}</h3>
+              <h3>Pression : {{ sensors.pressure }}</h3>
+              <h3>Luminosité : {{ sensors.luminosity }}</h3>
+            </div>
+
           </el-tab-pane>
 
 
@@ -80,24 +134,16 @@
           <el-tab-pane label="Daemon">
 
             <el-button-group>
-              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartZigateListener">Restart zigatelistener</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartZigateListener">Restart zigate listener</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartZigateBroker">Restart zigate broker</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartBroadlinkBroker">Restart Broadlink broker</el-button>
+
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartPi">Restart PI</el-button>
             </el-button-group>
-          </el-tab-pane>
-
-
-          <el-tab-pane label="Sensors">
-            <div>
-              <h3>Temperature : {{ sensors.temperature }}</h3>
-              <h3>Humidité : {{ sensors.humidity }}</h3>
-              <h3>Pression : {{ sensors.pressure }}</h3>
-              <h3>Luminosité : {{ sensors.luminosity }}</h3>
-            </div>
 
           </el-tab-pane>
 
-
-
-          <el-tab-pane label="Download">
+          <el-tab-pane label="DownloadFrame">
 
             <iframe width="90%" height="90%" src="./downloaded/"></iframe>
           </el-tab-pane>
@@ -124,6 +170,9 @@ import Vue from 'vue'
     name: 'PicturePlayer',
     data: function(){
       return {
+        ikea1LampIntensity: 50,
+        isRetrievingIkeaLampValue: false,
+        changeLampTimeout: false,
         loadingCounter: 0,
         downloadSpeed: "??",
         downloadLogs: "",
@@ -134,6 +183,7 @@ import Vue from 'vue'
         daemons_state: {
           zigate_listener: true,
           zigate_broker: true,
+          broadlinkbroker: true,
           mpc: true,
           mmpc: true,
         },
@@ -141,11 +191,46 @@ import Vue from 'vue'
           temperature: "loading",
           pression: "loading",
           humidity: "loading",
-          luminosity: "loading"
+          luminosity: "loading",
+          ikeaLamp1_current_level: "loading"
         }
       }
     },
     watch: {
+      ikea1LampIntensity: function(newValue, oldValue) {
+        var self=this;
+        console.log('changed', oldValue, newValue);
+        if(self.isRetrievingIkeaLampValue)
+        {
+          console.log('Abandon');
+          self.isRetrievingIkeaLampValue = false;
+          return true;
+        }
+
+        if(self.changeLampTimeout)
+        {
+          clearTimeout(self.changeLampTimeout);
+        }
+        self.changeLampTimeout = setTimeout(function() {
+          console.log('in timeout');
+          self.loadingCounter++;
+          self.$http.get(dashboardBaseUrl + "homecmd.php?action=ikeaLampSetIntensity&param=" + encodeURIComponent(newValue)).then(response => {
+            self.loadingCounter--;
+          },
+          error =>
+          {
+            self.loadingCounter--;
+          });
+        }, 200);
+
+      },
+      "sensors.ikeaLamp1_current_level": function() {
+        var self=this;
+        console.log('changed');
+        console.log(self.sensors.ikeaLamp1_current_level);
+        self.isRetrievingIkeaLampValue = true;
+        self.ikea1LampIntensity = parseInt(self.sensors.ikeaLamp1_current_level);
+      },
       "mounts.chooo7": function() {
         var self = this;
         if(self.mounts.chooo7) {
@@ -190,6 +275,22 @@ import Vue from 'vue'
           this.$notify.error({
             title: 'zigate_broker DEAD',
             message: 'zigate_broker est défaillant',
+            duration: 0
+          });
+        }
+      },
+      "daemons_state.broadlinkbroker": function() {
+        var self = this;
+        if(self.daemons_state.broadlinkbroker) {
+          this.$notify.success({
+            title: 'Broadlink broker OK',
+            message: 'Broadlink broker est OK',
+            duration: 0
+          });
+        }else{
+          this.$notify.error({
+            title: 'Broadlink broker DEAD',
+            message: 'Broadlink broker est défaillant',
             duration: 0
           });
         }
@@ -239,7 +340,7 @@ import Vue from 'vue'
         self.loadDownloadState();
         self.loadDaemonState();
         self.loadSensorState();
-        setTimeout(function() {self.refreshInformations();}, 10000);
+        setTimeout(function() {self.refreshInformations();}, 30000);
       },
 
       loadMountStates: function() {
@@ -295,6 +396,7 @@ import Vue from 'vue'
         self.$http.get(dashboardBaseUrl+"sensorstate.php?config=chooo7").then(response => {
           self.loadingCounter--;
           self.sensors = response.body;
+          console.log('sensors', self.sensors);
         }, error => {
           self.loadingCounter--;
           console.error(error);

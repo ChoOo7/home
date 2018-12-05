@@ -10,6 +10,7 @@ class Mpd
     $output = array();
     //var_dump($cmd);
     exec($cmd, $output);
+    return $output;
     //var_dump($output);
   }
 
@@ -27,6 +28,14 @@ class Mpd
   public function mopidy()
   {
     return 'mpc --port=6601';
+  }
+
+  public function lsArtistToPlaylist($artistDirectory)
+  {
+    $artistDirectory = "Local media/Artists/".$artistDirectory;
+    //$cmd = 'mpc ls '.escapeshellarg($artistDirectory).' | mpc add';
+    $cmd = $this->mopidy().' ls '.escapeshellarg($artistDirectory);
+    return $this->sendCommand($cmd);
   }
 
   public function addArtistToPlaylist($artistDirectory)
@@ -96,6 +105,7 @@ class Mpd
   
   public function addSpotifyArtist($artistName)
   {
+    https://open.spotify.com/artist/0gOsZcHl7H3ewXVIEnWFZX?si=pxkRC6lgQMWkST5Cc8riCQ
     $cmd = $this->mopidy().' search any '.escapeshellarg($artistName).' | grep spotify:artist | head -n 1 | '.$this->mopidy().' add';
     $this->sendCommand($cmd);
   }

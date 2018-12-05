@@ -6,12 +6,17 @@ while(ob_get_level())
 {
   ob_end_flush();
 }
+require_once(__DIR__.'/config/constants.php');
 require_once(__DIR__.'/denon.class.php');
 require_once(__DIR__.'/kodi.class.php');
+require_once(__DIR__.'/ifttt.class.php');
 require_once(__DIR__.'/smartphone.class.php');
 require_once(__DIR__.'/raspberry.class.php');
 require_once(__DIR__.'/zigate.class.php');
 require_once(__DIR__.'/mpd.class.php');
+require_once(__DIR__.'/broadlink.class.php');
+
+
 
 $dataDirectory = __DIR__.'/data/';
 
@@ -21,22 +26,36 @@ $d = new MyDenon();
 $k = new Kodi();
 $z = new Zigate();
 $mpd = new Mpd();
-
+$if = new Ifttt();
+$b = new Broadlink();
 
 $cmd = null;
 $param = null;
+$param2 = null;
 if(isset($_GET['action']))
 {
   $cmd = $_GET['action'];
+  $param = $_GET['param'];
+  $param2 = $_GET['param2'];
 }else {
   $cmd = $argv[1];
   $param = @$argv[2];
+  $param2 = @$argv[3];
 }
 
-function launchInBackground($cmd)
+function homeCmd($cmd, $param)
 {
-  $cmd = 'nohup '.$cmd.' > /tmp/output &';
-  system($cmd);
+  $cmd = "php ".__FILE__." ".escapeshellarg($cmd)." ".escapeshellarg($param);
+  passthru($cmd);
+}
+
+function launchInBackground($command)
+{
+  $output = "/tmp/log";
+  @chmod($output, 0777);
+  $command = "nohup ".$command ." > ".$output." 2>&1 &";
+  //$cmd = 'nohup '.$cmd.' > /tmp/output &';
+  system($command);
 }
 
 function detectClicNumber($btnName)
@@ -79,7 +98,7 @@ switch($cmd)
     break;
 
   case "btn1-3":
-    $cmd = "php ".__DIR__."/homecmd.php tata";
+    $cmd = "php ".__DIR__."/homecmd.php peppa";
     echo "\n".$cmd."\n";
     passthru($cmd);
     break;
@@ -98,6 +117,9 @@ switch($cmd)
     echo "2-2";
     break;
 
+  case 'ikeaLampSetIntensity':
+    $z->setLampToIntensity(IKEA_LAMP01_ADDR, IKEA_LAMP01_CLUSTER, $param);
+    break;
 
   case 'ikeaLamp1On':
     $command = 'php /var/home/raspberry/zigate/ikealampe1/on.php';
@@ -112,18 +134,25 @@ switch($cmd)
     launchInBackground($command);
     break;
   case 'ikeaLamp1High':
-    $command = 'php /var/home/raspberry/zigate/ikealampe1/high.php';
-    launchInBackground($command);
+    $z->setLampToIntensity(IKEA_LAMP01_ADDR, IKEA_LAMP01_CLUSTER, 100);
     break;
   case 'ikeaLamp1Medium':
-    $command = 'php /var/home/raspberry/zigate/ikealampe1/medium.php';
-    launchInBackground($command);
+    $z->setLampToIntensity(IKEA_LAMP01_ADDR, IKEA_LAMP01_CLUSTER, 50);
+    break;
+  case 'ikeaLamp1MediumLow':
+    $z->setLampToIntensity(IKEA_LAMP01_ADDR, IKEA_LAMP01_CLUSTER, 25);
     break;
   case 'ikeaLamp1Low':
-    $command = 'php /var/home/raspberry/zigate/ikealampe1/low.php';
-    launchInBackground($command);
+    $z->setLampToIntensity(IKEA_LAMP01_ADDR, IKEA_LAMP01_CLUSTER, 2);
     break;
 
+
+  case 'broadlinkOn':
+    $if->broadlinkOn();
+    break;
+  case 'broadlinkOff':
+    $if->broadlinkOff();
+    break;
 
   case 'movementDetected':
     $command = 'php /var/home/raspberry/homecmd.php ikeaLamp1On';
@@ -160,11 +189,38 @@ switch($cmd)
     file_put_contents($dataDirectory.'/'.$paramName, $data);
     break;
 
+  case 'storeLampState':
+    $paramName = strtolower(str_replace('set', '', $cmd));
+    $lampAddr = $param;
+    $dataJsonString = $param2;
+    $data = json_decode($dataJsonString, true);
+    foreach($data as $k=>$v) {
+      file_put_contents($dataDirectory . '/' . $lampAddr.'-'.$k, $v);
+    }
+    break;
 
-  case "setPressure":
-    $downloadSpeed = 50000;
+
+  case "restartZigateListener":
     $command = 'sudo service zigatelistener restart';
     passthru($command);
+    break;
+
+
+  case "restartZigateBroker":
+    $command = 'sudo service zigate_broker restart';
+    passthru($command);
+    break;
+
+  case "restartBroadlinkBroker":
+    $command = 'sudo service broadlinkbroker restart';
+    passthru($command);
+    break;
+
+  case "chauffageOn":
+    $b->setBroadlinkState(0, true);
+    break;
+  case "chauffageOff":
+    $b->setBroadlinkState(0, false);
     break;
 
 
@@ -554,6 +610,11 @@ switch($cmd)
     $d->volumeSet(15);
     break;
 
+  case "restartPi":
+    exec('sudo reboot');
+    break;
+
+  case "pepa":
   case "peppa":
   case "peppapig":
     $d->powerOnAndWaitForRead();
@@ -610,14 +671,6 @@ switch($cmd)
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(827);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    */
 
     $mpd->clearPlaylist();
     $mpd->addArtistToPlaylist("pereCastor");
@@ -629,6 +682,29 @@ switch($cmd)
     $mpd->denonOn();
 
     $d->volumeSet(15);
+    break;
+  case "belleBete":
+  case "laBelleEtLaBete":
+    $d->powerOnAndWaitForRead();
+    $d->setDigitIn();
+    $d->volumeSet(15);
+
+    $mpd->clearPlaylist();
+    $mpd->addArtistToPlaylist("La belle et la bete");
+    $mpd->setShuffle(true);
+    $mpd->play();
+    $mpd->setMpcSourceMopidy();
+
+    $mpd->cuisineOff();
+    $mpd->denonOn();
+
+    $d->volumeSet(15);
+    break;
+
+
+  case "mpcLsArtist":
+    $res = $mpd->lsArtistToPlaylist($param);
+    var_dump($res);
     break;
 
   case "cuisineOn":
@@ -648,54 +724,39 @@ switch($cmd)
     $d->powerOff();
     break;
 
-  case "camille":
+  case "playArtist":
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(827);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    */
 
     $mpd->clearPlaylist();
-    $mpd->addSpotifyArtist("camille");
+    $mpd->addArtistToPlaylist($param);
     $mpd->setShuffle(true);
     $mpd->play();
 
-    $mpd->cuisineOn();
     $mpd->denonOn();
 
     $d->volumeSet(15);
+
+  case "camille":
+    homeCmd("playArtist", "Camille");
     break;
 
   case "floyd":
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(827);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    */
-
-    $mpd->clearPlaylist();
-    $mpd->addIcecastToMpd();
-    $mpd->addSpotifyArtist("Pink Floyd");
-    $mpd->setShuffle(true);
-    $mpd->play();
-
-    $mpd->cuisineOn();
-    $mpd->denonOn();
-
-    $d->volumeSet(15);
+    homeCmd("playArtist", "Pink Floyd");
     break;
+
+  case "teteRaides":
+  case "tetesRaides":
+  case "tetes":
+    homeCmd("playArtist", "Tetes Raides");
+    break;
+
+  case "hang":
+  case "hangMassive":
+    homeCmd("playArtist", "Hang Massive");
+    break;
+
 
   case "vargas":
     $d->powerOnAndWaitForRead();
@@ -715,7 +776,7 @@ switch($cmd)
     $mpd->setShuffle(true);
     $mpd->play();
 
-    $mpd->cuisineOn();
+    //$mpd->cuisineOn();
     $mpd->denonOn();
     
 
@@ -1132,6 +1193,21 @@ switch($cmd)
     $retry = 3;
     $z->launchCommand($device, $deviceCmd, $retry);
     break;
+  default:
+    echo"\nUnknow command. Available commands : ";
+    $cnt = file(__FILE__);
+    foreach($cnt as $line)
+    {
+      $line = trim($line);
+      if(strpos($line, 'case "') !== false && strpos($line, 'str_replace') === false)
+      {
+        $line = str_replace('case "', "", $line);
+        $line = str_replace('":', "", $line);
+        $line = trim($line);
+        echo "\n - ".$line;
+      }
+    }
+  echo "\n";
 
 }
 

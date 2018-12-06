@@ -117,6 +117,13 @@ function procmsg($topic, $msg){
     $decoded = json_decode($msg, true);
     $lampState = array();
     //var_dump($decoded);
+    if(strpos($topic, '/attribute_changed/') !== false)
+    {
+      $attribute = $decoded;
+      $name = $attribute["name"];
+      $value = $attribute["value"];
+      $lampState[$name] = $value;
+    }
     if(array_key_exists("endpoints", $decoded))
     {
       $endpoints = $decoded["endpoints"];
@@ -131,13 +138,9 @@ function procmsg($topic, $msg){
 
               switch ($name) {
                 case "onoff":
-                  $lampState['onoff'] = $value;
-                  break;
                 case "current_level":
-                  $lampState['current_level'] = $value;
-                  break;
                 case "colour_temperature":
-                  $lampState['colour_temperature'] = $value;
+                  $lampState[$name] = $value;
                   break;
               }
             }

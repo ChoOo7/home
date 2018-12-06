@@ -556,30 +556,7 @@ switch($cmd)
   case "oui":
   case "ouioui":
   case "ouiOui":
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(821);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    $d->volumeSet(15);
-    */
-
-    $mpd->clearPlaylist();
-    $mpd->addArtistToPlaylist("ouiOui");
-    $mpd->setShuffle(true);
-    $mpd->play();
-    $mpd->setMpcSourceMopidy();
-
-    $mpd->cuisineOff();
-    $mpd->denonOn();
-
-    $d->volumeSet(15);
-
+    homeCmd("playArtist", "ouiOui");
     break;
 
 
@@ -617,88 +594,26 @@ switch($cmd)
   case "pepa":
   case "peppa":
   case "peppapig":
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(824);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    */
-
-    $mpd->clearPlaylist();
-    $mpd->addArtistToPlaylist("PeppaPig");
-    $mpd->setShuffle(true);
-    $mpd->play();
-    $mpd->setMpcSourceMopidy();
-
-    $mpd->cuisineOff();
-    $mpd->denonOn();
-
-    $d->volumeSet(15);
+    homeCmd("playArtist", "PeppaPig");
+    break;
+  case "yak":
+  case "yakari":
+  case "yakary":
+    homeCmd("playArtist", "Yakari");
     break;
 
   case "poule":
   case "pouleRousse":
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(823);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    $d->volumeSet(15);
-    */
-
-    $mpd->clearPlaylist();
-    $mpd->addArtistToPlaylist("pouleRousse");
-    $mpd->setShuffle(true);
-    $mpd->play();
-    $mpd->setMpcSourceMopidy();
-
-    $mpd->cuisineOff();
-    $mpd->denonOn();
+    homeCmd("playArtist", "pouleRousse");
     break;
 
   case "castor":
   case "pereCastor":
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-
-    $mpd->clearPlaylist();
-    $mpd->addArtistToPlaylist("pereCastor");
-    $mpd->setShuffle(true);
-    $mpd->play();
-    $mpd->setMpcSourceMopidy();
-
-    $mpd->cuisineOff();
-    $mpd->denonOn();
-
-    $d->volumeSet(15);
+    homeCmd("playArtist", "pereCastor");
     break;
   case "belleBete":
   case "laBelleEtLaBete":
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-
-    $mpd->clearPlaylist();
-    $mpd->addArtistToPlaylist("La belle et la bete");
-    $mpd->setShuffle(true);
-    $mpd->play();
-    $mpd->setMpcSourceMopidy();
-
-    $mpd->cuisineOff();
-    $mpd->denonOn();
-
-    $d->volumeSet(15);
+    homeCmd("playArtist", "La belle et la bete");
     break;
 
 
@@ -737,6 +652,7 @@ switch($cmd)
     $mpd->denonOn();
 
     $d->volumeSet(15);
+    break;
 
   case "camille":
     homeCmd("playArtist", "Camille");

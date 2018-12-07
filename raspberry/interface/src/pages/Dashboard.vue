@@ -137,7 +137,12 @@
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartZigateListener">Restart zigate listener</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartZigateBroker">Restart zigate broker</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartBroadlinkBroker">Restart Broadlink broker</el-button>
-
+            </el-button-group>
+            <el-button-group>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartMpd">Restart mpd</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartMopidy">Restart mopidy</el-button>
+            </el-button-group>
+            <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartPi">Restart PI</el-button>
             </el-button-group>
 

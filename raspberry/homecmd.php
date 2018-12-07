@@ -210,6 +210,15 @@ switch($cmd)
     $command = 'sudo service zigate_broker restart';
     passthru($command);
     break;
+  case "restartMopidy":
+    $command = 'sudo service mopidy restart';
+    passthru($command);
+    break;
+  
+  case "restartMpd":
+    $command = 'sudo service mpd restart';
+    passthru($command);
+    break;
 
   case "restartBroadlinkBroker":
     $command = 'sudo service broadlinkbroker restart';

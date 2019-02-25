@@ -17,6 +17,18 @@
             <br />
             <h3>Temperature : {{ sensors.temperature }}</h3>
             <br />
+            <div v-if="facts && facts.presence_detector">
+              <h3>Last movement : {{ facts.presence_detector.last_action }}</h3>
+              <br />
+            </div>
+            <div v-if="facts && facts.tel_sim_connect">
+              <h3>Tel sim last co : {{ facts.tel_sim_connect.last_action }}</h3>
+              <br />
+            </div>
+            <div v-if="facts && facts.tel_so_connect">
+              <h3>Tel sim last co : {{ facts.tel_so_connect.last_action }}</h3>
+              <br />
+            </div>
             <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="castor">Pere Castor</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="pig">Peppa pig</el-button>
@@ -71,10 +83,10 @@
 
             <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="castor">Pere Castor</el-button>
-              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="belleBete">La belle et la bete</el-button>
 
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="yakari">Yakari</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="trotro">Tro tro</el-button>
+
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="ouioui">Oui oui</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="tchoupi">Tchoupi</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="sam">Sam le pompier</el-button>
@@ -82,8 +94,13 @@
             </el-button-group>
 
             <el-button-group>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="henrides">henriDes</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="tata">tata</el-button>
+            </el-button-group>
+
+            <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="poulerousse">Poule rousse</el-button>
-              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="poulerousse">Histoire</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="laBelleEtLaBete">La belle et la bete</el-button>
             </el-button-group>
           </el-tab-pane>
 
@@ -141,9 +158,11 @@
             <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartMpd">Restart mpd</el-button>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartMopidy">Restart mopidy</el-button>
+
             </el-button-group>
             <el-button-group>
               <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="restartPi">Restart PI</el-button>
+              <el-button class="launchAction" v-on:click.stop.prevent="launchAction" data-do="shutdownPi">Shutdown PI</el-button>
             </el-button-group>
 
           </el-tab-pane>
@@ -167,7 +186,7 @@
 // The parent route component is Home.vue in pages.
 // Loads home.vue from here.
 
-var dashboardBaseUrl = "http://dashboard.home.chooo7.com/";
+var dashboardBaseUrl = document.location.protocol+"//dashboard.home.chooo7.com/";
 
 import Vue from 'vue'
 
@@ -179,6 +198,7 @@ import Vue from 'vue'
         isRetrievingIkeaLampValue: false,
         changeLampTimeout: false,
         loadingCounter: 0,
+        facts: {},
         downloadSpeed: "??",
         downloadLogs: "",
         mounts: {
@@ -345,6 +365,7 @@ import Vue from 'vue'
         self.loadDownloadState();
         self.loadDaemonState();
         self.loadSensorState();
+        self.loadFacts();
         setTimeout(function() {self.refreshInformations();}, 30000);
       },
 
@@ -386,7 +407,7 @@ import Vue from 'vue'
         self.$http.get(dashboardBaseUrl+"daemonstate.php?config=chooo7").then(response => {
           self.loadingCounter--;
         self.daemons_state = response.body;
-      }, error => {
+        }, error => {
           self.loadingCounter--;
           console.error(error);
         });
@@ -400,9 +421,23 @@ import Vue from 'vue'
         self.loadingCounter++;
         self.$http.get(dashboardBaseUrl+"sensorstate.php?config=chooo7").then(response => {
           self.loadingCounter--;
-          self.sensors = response.body;
-          console.log('sensors', self.sensors);
-        }, error => {
+        self.sensors = response.body;
+        console.log('sensors', self.sensors);
+      }, error => {
+          self.loadingCounter--;
+          console.error(error);
+        });
+
+      },
+
+      loadFacts: function() {
+        var self = this;
+        self.loadingCounter++;
+        self.$http.get(dashboardBaseUrl+"facts.php").then(response => {
+          self.loadingCounter--;
+        self.facts = response.body;
+        console.log('facts', self.facts);
+      }, error => {
           self.loadingCounter--;
           console.error(error);
         });

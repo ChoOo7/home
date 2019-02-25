@@ -5,7 +5,7 @@ class MyDenon
   
   public function getIp()
   {
-    return "192.168.0.202";
+    return "192.168.0.150";
   }
   
   protected function sendCommand($url, $cmd = null, $async = true)

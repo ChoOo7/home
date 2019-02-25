@@ -76,6 +76,7 @@ function procmsg($topic, $msg){
       case "temperature":
         $temp = $decoded["value"];
         $cmd = 'php /var/home/raspberry/homecmd.php setTemperature '.escapeshellarg($temp);
+        var_dump($cmd);
         exec($cmd, $output);
         break;
       case "humidity":

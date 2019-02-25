@@ -238,6 +238,9 @@ foreach ($infos as $timestamp => $values) {
             <button class="btn btn-default doAction" type="button" data-do="castor">
               <em class="glyphicon"></em> Pere castor
             </button>
+            <button class="btn btn-default doAction" type="button" data-do="yakari">
+              <em class="glyphicon"></em> Yakari
+            </button>
 
             <button class="btn btn-default doAction" type="button" data-do="henrides">
               <em class="glyphicon"></em> Henri des

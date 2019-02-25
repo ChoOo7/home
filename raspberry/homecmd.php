@@ -15,6 +15,8 @@ require_once(__DIR__.'/raspberry.class.php');
 require_once(__DIR__.'/zigate.class.php');
 require_once(__DIR__.'/mpd.class.php');
 require_once(__DIR__.'/broadlink.class.php');
+require_once(__DIR__.'/follow.class.php');
+require_once(__DIR__.'/lastFact.php');
 
 
 
@@ -86,13 +88,13 @@ switch($cmd)
     break;
 
   case "btn1-1":
-    $cmd = "php ".__DIR__."/homecmd.php castor";
+    $cmd = "php ".__DIR__."/homecmd.php yakari";
     echo "\n".$cmd."\n";
     passthru($cmd);
     break;
 
   case "btn1-2":
-    $cmd = "php ".__DIR__."/homecmd.php trotro";
+    $cmd = "php ".__DIR__."/homecmd.php castor";
     echo "\n".$cmd."\n";
     passthru($cmd);
     break;
@@ -154,9 +156,36 @@ switch($cmd)
     $if->broadlinkOff();
     break;
 
+  case "detectTelSo":
+    if(LastFact::IsIpOnLan(TEL_SO_IP))
+    {
+      $t = LastFact::getInstance(LastFact::$TEl_SO_CONNECTED);
+      $t->setLastConnectionDate();
+    }
+    break;
+  case "detectTelSi":
+    if(LastFact::IsIpOnLan(TEL_SIM_IP))
+    {
+      $t = LastFact::getInstance(LastFact::$TEl_SIM_CONNECTED);
+      $t->setLastConnectionDate();
+    }
+    break;
+
+
+  case "detectTelSiPos":
+    $_f = FollowMe::getInstance(FOLLOW_TOKEN_SI);
+    $pos = $_f->getRemoteInformation();
+    $isLocationIsInSector = $_f->isLocationInSector($pos, HOME_LAT, HOME_LNG, HOME_PRECISION);
+    if($isLocationIsInSector)
+    {
+      $t = LastFact::getInstance(LastFact::$TEL_SIM_POS_HOME);
+      $t->setLastConnectionDate();
+    }
+    break;
+
   case 'movementDetected':
-    $command = 'php /var/home/raspberry/homecmd.php ikeaLamp1On';
-    launchInBackground($command);
+    $t = LastFact::getInstance(LastFact::$PRESENCE_DETECTOR);
+    $t->setLastConnectionDate();
     break;
 
   case "downloadSpeedSlow":
@@ -214,7 +243,7 @@ switch($cmd)
     $command = 'sudo service mopidy restart';
     passthru($command);
     break;
-  
+
   case "restartMpd":
     $command = 'sudo service mpd restart';
     passthru($command);
@@ -226,10 +255,10 @@ switch($cmd)
     break;
 
   case "chauffageOn":
-    $b->setBroadlinkState(0, true);
+    $b->setBroadlinkState(0, 1);
     break;
   case "chauffageOff":
-    $b->setBroadlinkState(0, false);
+    $b->setBroadlinkState(0, 0);
     break;
 
 
@@ -459,6 +488,7 @@ switch($cmd)
   case "cpt":
   case "comptine":
   case "comptines":
+    //TODO
     $d->powerOnAndWaitForRead();
     $d->setDigitIn();
     $d->volumeSet(15);
@@ -474,92 +504,20 @@ switch($cmd)
   case "tro":
   case "trotro":
   case "troTro":
-
-  $d->powerOnAndWaitForRead();
-  $d->setDigitIn();
-  $d->volumeSet(15);
-  /*
-  $k->clearPlaylist();
-  $k->setShuffle();
-  $k->addArtistToPlaylist(827);
-  $k->setShuffle();
-  $k->playPlaylist();
-  $k->setShuffle();
-  */
-
-  $mpd->clearPlaylist();
-  $mpd->addArtistToPlaylist("troTro");
-  $mpd->setShuffle(true);
-  $mpd->play();
-  $mpd->setMpcSourceMopidy();
-
-  $mpd->cuisineOff();
-  $mpd->denonOn();
-
-  $d->volumeSet(15);
+    homeCmd("playArtist", "troTro");
     break;
 
   case "henri":
   case "des":
   case "henrides":
   case "henrisdes":
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(828);
-    $k->setShuffle();
-    $k->playPlaylist();
-
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle();
-    $k->addArtistToPlaylist(828);
-    $k->setShuffle();
-    $k->playPlaylist();
-    $k->setShuffle();
-    $d->volumeSet(15);
-    */
-
-    $mpd->clearPlaylist();
-    $mpd->addArtistToPlaylist("henrisDes");
-    $mpd->setShuffle(true);
-    $mpd->play();
-    $mpd->setMpcSourceMopidy();
-
-    $mpd->cuisineOff();
-    $mpd->denonOn();
-
-    $d->volumeSet(15);
+    homeCmd("playArtist", "henrisDes");
     break;
 
 
   case "tata":
   case "marthe":
-    $d->powerOnAndWaitForRead();
-    $d->setDigitIn();
-    $d->volumeSet(15);
-    /*
-    $k->clearPlaylist();
-    $k->setShuffle(false);
-    $k->addArtistToPlaylist(820);
-    $k->setShuffle(false);
-    $k->playPlaylist();
-    $k->setShuffle(false);
-    $d->volumeSet(15);
-    */
-
-  $mpd->clearPlaylist();
-  $mpd->addArtistToPlaylist("Tata Marthe");
-  $mpd->setShuffle(false);
-  $mpd->play();
-  $mpd->setMpcSourceMopidy();
-
-  $mpd->cuisineOff();
-  $mpd->denonOn();
-
-  $d->volumeSet(13);
+    homeCmd("playArtist", "Tata Marthe");
     break;
 
   case "oui":
@@ -598,6 +556,10 @@ switch($cmd)
 
   case "restartPi":
     exec('sudo reboot');
+    break;
+
+  case "shutdownPi":
+    exec('sudo shutdown --poweroff');
     break;
 
   case "pepa":
@@ -653,9 +615,15 @@ switch($cmd)
     $d->setDigitIn();
     $d->volumeSet(15);
 
+    $shuffle = $param != "Tata Marthe";
+
     $mpd->clearPlaylist();
+    $mpd->setShuffle($shuffle);
+    sleep(1);
+
     $mpd->addArtistToPlaylist($param);
-    $mpd->setShuffle(true);
+    $mpd->setShuffle($shuffle);
+    sleep(1);
     $mpd->play();
 
     $mpd->denonOn();
